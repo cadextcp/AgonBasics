@@ -11,16 +11,19 @@ Beispiele:
         GUI-Emulator oeffnen, MOS-Prompt.
 
     uv run tools/run.py --program hello.bas
-        GUI-Emulator oeffnen, im beispiele/-Ordner, BBC-BASIC-Prompt.
-        Im BASIC-Prompt: `CHAIN "hello.bas"` tippen, um das Programm zu starten.
+        GUI-Emulator oeffnen, BBC-BASIC-Prompt.
+        Im BASIC-Prompt: `*CD beispiele` + `CHAIN "hello.bas"` tippen.
 
     uv run tools/run.py --headless --program hello.bas
-        CLI-Emulator, pipet `cd beispiele`, `bin/bbcbasic`, `CHAIN "hello.bas"`
-        in stdin. Bricht nach --timeout Sekunden ab, falls das Programm nicht
-        selbst beendet (via PROC_dbg_exit aus lib/debug.bas).
+        CLI-Emulator, pipet `bin/bbcbasic`, `*CD beispiele`,
+        `CHAIN "hello.bas"` in stdin. Bricht nach --timeout Sekunden ab,
+        falls das Programm nicht selbst beendet (PROC_dbg_exit).
 
     uv run tools/run.py --firmware quark -u
         GUI-Emulator mit Quark MOS 1.04, ohne CPU-Limit.
+
+    uv run tools/run.py --keyboard 0
+        Keyboard-Layout ueberschreiben (0=UK, 1=US, 2=German default).
 """
 
 from __future__ import annotations
@@ -37,6 +40,13 @@ ROOT = Path(__file__).resolve().parent.parent
 SDCARD_STAGED = ROOT / "sdcard" / "staged"
 EMU_ROOT = ROOT / "emulator" / "fab-agon-emulator-v1.1.3-windows-x64"
 EMU_ROOT_LINUX = ROOT / "emulator" / "fab-agon-emulator-v1.1.3-linux-x86_64"
+
+# Default-Keyboard-Layout fuer autoexec.txt. Uebersicht aus der offiziellen
+# Doku (https://agonplatform.github.io/agon-docs/mos/Star-Commands/#keyboard-layout):
+#   0 UK, 1 US, 2 German, 3 Italian, 4 Spanish, 5 French, 6 Belgian,
+#   7 Norwegian, 8 Japanese, 9 US International, ..., 17 Dvorak.
+# Ueberschreibbar per --keyboard N.
+DEFAULT_KEYBOARD = 2
 
 
 def log(msg: str) -> None:
@@ -74,19 +84,23 @@ def write_autoexec(sdcard: Path, lines: list[str]) -> None:
     log(f"autoexec.txt gesetzt: {len(lines)} Zeile(n)")
 
 
-def restore_default_autoexec(sdcard: Path) -> None:
+def restore_default_autoexec(sdcard: Path, keyboard: int = DEFAULT_KEYBOARD) -> None:
     """Stellt ein neutrales autoexec wieder her (BBC BASIC am MOS-Prompt)."""
-    # Einfaches Default: nur MOS-Prompt
-    write_autoexec(sdcard, ["SET KEYBOARD 1"])
+    # Einfaches Default: nur Keyboard setzen
+    write_autoexec(sdcard, [f"SET KEYBOARD {keyboard}"])
 
 
-def build_gui_autoexec(program: str | None) -> list[str]:
-    """Autoexec fuer GUI-Mode."""
-    lines = ["SET KEYBOARD 1"]
-    if program:
-        lines.append("cd beispiele")
-        lines.append("bin/bbcbasic")
-    return lines
+def build_gui_autoexec(
+    program: str | None, keyboard: int = DEFAULT_KEYBOARD
+) -> list[str]:
+    """Autoexec fuer GUI-Mode. Startet BBC BASIC vom Root.
+
+    Anmerkung: 'cd beispiele' + 'bin/bbcbasic' wuerde MOS in beispiele/
+    hinterlassen, wo bin/bbcbasic nicht existiert. Wir starten daher
+    bbcbasic aus Root; der Nutzer tippt im BASIC-Prompt selber
+    *CD beispiele und CHAIN "programm.bas".
+    """
+    return [f"SET KEYBOARD {keyboard}", "bin/bbcbasic"]
 
 
 def run_gui(args: argparse.Namespace) -> int:
@@ -96,7 +110,7 @@ def run_gui(args: argparse.Namespace) -> int:
         log(f"GUI-Emulator nicht gefunden: {exe}")
         return 1
 
-    write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program))
+    write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program, args.keyboard))
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
     if args.firmware:
@@ -131,8 +145,8 @@ def run_headless(args: argparse.Namespace) -> int:
 
     # Headless: wir pipen stdin und erwarten, dass das Programm selbst via
     # PROC_dbg_exit beendet. Ein Default-autoexec darf nichts unerwartetes
-    # tun.
-    restore_default_autoexec(SDCARD_STAGED)
+    # tun ausser Keyboard setzen.
+    restore_default_autoexec(SDCARD_STAGED, args.keyboard)
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
     if args.unlimited_cpu:
@@ -224,6 +238,16 @@ def main() -> int:
         type=float,
         default=20.0,
         help="Headless-Timeout in Sekunden (default: 20)",
+    )
+    parser.add_argument(
+        "--keyboard",
+        type=int,
+        default=DEFAULT_KEYBOARD,
+        metavar="N",
+        help=(
+            f"Keyboard-Layout fuer SET KEYBOARD (default: {DEFAULT_KEYBOARD} = German; "
+            "0=UK, 1=US, 2=German, 3=Italian, 5=French, 11=Swiss German, ...)"
+        ),
     )
     parser.add_argument(
         "extra_args",

@@ -35,6 +35,13 @@ emulator/     (gitignored) Vom Setup entpackter Emulator
 sdcard/staged/(gitignored) Zusammengefuegte SD-Karte: Popup MOS + beispiele + lib
 ```
 
+## Tastatur-Default
+
+Der Default ist **SET KEYBOARD 2 (German)**. `tools/run.py` hat eine
+Konstante `DEFAULT_KEYBOARD = 2`; `tools/debug.py` importiert dieselbe.
+Ein Override per CLI: `--keyboard N`. Nummernliste in
+`docs/WORKFLOW.md#tastatur-layout`.
+
 ## Tool-Konventionen
 
 Alles Host-seitige Tooling liegt in `tools/` und wird mit `uv` ausgefuehrt:

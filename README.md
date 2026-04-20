@@ -96,6 +96,9 @@ Details in [docs/DEBUGGING.md](docs/DEBUGGING.md).
 
 - `.bas`-Dateien haben CRLF-Zeilenenden (von Agon-BBC-BASIC erwartet).
 - `autoexec.txt` auf der SD-Karte muss LF haben (Tools regeln das).
+- Tastatur-Default ist **deutsch** (`SET KEYBOARD 2`); Override per `--keyboard N`
+  bei `run.py` / `debug.py`. Nummern: 0=UK, 1=US, 2=DE, 5=FR, 11=Schweiz-DE, ...
+  Siehe [docs/WORKFLOW.md](docs/WORKFLOW.md#tastatur-layout).
 - Der Emulator wird **nicht** eingecheckt - er wird beim Setup
   heruntergeladen und entpackt (`emulator/`, gitignored).
 - `sdcard/staged/` wird vom Setup erzeugt und ist ebenfalls gitignored.

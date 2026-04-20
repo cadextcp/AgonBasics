@@ -54,16 +54,25 @@ def find_emulator_exe() -> Path:
     return exe
 
 
-def write_autoexec_for_program(program: str | None) -> None:
+def write_autoexec_for_program(program: str | None, keyboard: int) -> None:
     # Start bbcbasic aus dem Root; *CD + CHAIN tippt der Nutzer selbst
     # (siehe Hinweis im Terminal).
-    lines = ["SET KEYBOARD 1", "bin/bbcbasic"]
+    lines = [f"SET KEYBOARD {keyboard}", "bin/bbcbasic"]
     autoexec = SDCARD_STAGED / "autoexec.txt"
     autoexec.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     log(f"autoexec.txt fuer Debug-Run geschrieben ({len(lines)} Zeilen)")
 
 
 def main() -> int:
+    # DEFAULT_KEYBOARD aus run.py wiederverwenden
+    from importlib.util import spec_from_file_location, module_from_spec
+
+    spec = spec_from_file_location("_run", ROOT / "tools" / "run.py")
+    run_mod = module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(run_mod)  # type: ignore[union-attr]
+    default_keyboard = run_mod.DEFAULT_KEYBOARD
+
     parser = argparse.ArgumentParser(description="AgonBasics debug")
     parser.add_argument(
         "--program",
@@ -86,6 +95,16 @@ def main() -> int:
         "-u", "--unlimited-cpu", action="store_true"
     )
     parser.add_argument(
+        "--keyboard",
+        type=int,
+        default=default_keyboard,
+        metavar="N",
+        help=(
+            f"Keyboard-Layout fuer SET KEYBOARD (default: {default_keyboard} = German; "
+            "0=UK, 1=US, 2=German, 5=French, 11=Swiss German, ...)"
+        ),
+    )
+    parser.add_argument(
         "extra_args", nargs="*",
         help="Weitere Argumente werden durchgereicht",
     )
@@ -104,7 +123,7 @@ def main() -> int:
         log(f"GUI-Emulator nicht gefunden: {e}")
         return 1
 
-    write_autoexec_for_program(args.program)
+    write_autoexec_for_program(args.program, args.keyboard)
 
     cmd = [
         str(exe),

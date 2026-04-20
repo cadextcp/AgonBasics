@@ -133,6 +133,23 @@ uv run tools/run.py --fullscreen --mode 2
 uv run tools/run.py -- --verbose --border ff0000
 ```
 
+## Tastatur-Layout
+
+Der Default ist **deutsch** (`SET KEYBOARD 2`). `tools/run.py` und
+`tools/debug.py` schreiben die Zeile automatisch in `autoexec.txt`,
+bevor der Emulator startet.
+
+Ueberschreiben mit `--keyboard N`:
+
+```
+uv run tools/run.py --headless --keyboard 0         # UK
+uv run tools/run.py --headless --keyboard 1         # US
+uv run tools/run.py --headless --keyboard 11        # Swiss German
+```
+
+Nummernliste: <https://agonplatform.github.io/agon-docs/mos/Star-Commands/#keyboard-layout>.
+Default aendern: Konstante `DEFAULT_KEYBOARD` in `tools/run.py`.
+
 ## Typische Iteration
 
 1. Quellcode editieren in VS Code.
