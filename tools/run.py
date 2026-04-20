@@ -157,8 +157,9 @@ def run_gui(args: argparse.Namespace) -> int:
     write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program, args.keyboard))
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
-    if args.firmware:
-        cmd += ["--firmware", args.firmware]
+    # GUI-Default des Emulators ist 'platform' (MOS 3.x), wir setzen aber
+    # immer explizit die vom CLI und unseren Tests bekannte 2.x-Variante.
+    cmd += ["--firmware", args.firmware]
     if args.unlimited_cpu:
         cmd.append("-u")
     if args.fullscreen:

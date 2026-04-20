@@ -96,6 +96,12 @@ def main() -> int:
     parser.add_argument(
         "--firmware",
         choices=["console8", "quark", "electron", "fb"],
+        default="console8",
+        help=(
+            "MOS/VDP-Variante (default: console8 = MOS 2.3.3). "
+            "GUI-Default des Emulators waere 'platform' (MOS 3.x); "
+            "2.3.3 ist konsistent zum CLI und gegen autoexec getestet."
+        ),
     )
     parser.add_argument(
         "-u", "--unlimited-cpu", action="store_true"
