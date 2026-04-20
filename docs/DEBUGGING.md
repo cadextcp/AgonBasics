@@ -51,6 +51,38 @@ bevor sie in die SD-Karte gelangt.
 | `PROC_dbg_assert(cond, "msg")` | bei `cond=0`: `msg` loggen, `=== TEST FAIL ===` drucken, Emulator mit Exit-Code 1 beenden |
 | `FN_dbg_time` | Centisekunden seit `PROC_dbg_init` |
 
+### Hold-Mode: Fenster nach PROC_dbg_exit offen halten
+
+Beim interaktiven Debuggen in der GUI ist es lästig, dass
+`PROC_dbg_exit` (auch von `PROC_dbg_assert` intern aufgerufen) das
+Emulator-Fenster sofort schließt — man sieht die Fehlermeldung nur
+kurz, dann ist alles weg.
+
+Abhilfe: `--hold` an `run.py` oder `debug.py`:
+
+```
+uv run tools/run.py   --program summe_bug.bas --hold
+uv run tools/debug.py --program summe_bug.bas --hold
+```
+
+Der Flag patcht die gestagte Programmdatei so, dass `PROC_dbg_exit`
+nur loggt und `END` aufruft statt den Emulator zu terminieren. Du
+landest im BBC-BASIC-Prompt `>` und kannst Variablen inspizieren,
+z. B.:
+
+```
+> PRINT f%
+0
+> PRINT i%
+5
+```
+
+Der Patch überlebt nur bis zum nächsten `uv run tools/deploy.py`
+(oder Test-Lauf), dann ist alles wieder normal.
+
+**Nicht benutzen** in automatisierten Tests — dort soll
+`PROC_dbg_exit` den Emulator wirklich beenden.
+
 ### Beispiel
 
 ```

@@ -11,15 +11,19 @@ Beispiele:
         GUI-Emulator oeffnen, direkt am BBC-BASIC-Prompt.
 
     uv run tools/run.py --program hello.bas
-        GUI-Emulator oeffnen, hello.bas laedt und startet automatisch
-        (autoexec: SET KEYBOARD 2 / cd beispiele / /bin/bbcbasic hello.bas).
+        GUI-Emulator oeffnen, hello.bas laedt und startet automatisch.
+
+    uv run tools/run.py --program summe_bug.bas --hold
+        GUI-Emulator. Programm startet, wenn PROC_dbg_exit aufgerufen wird
+        schliesst sich das Emulator-Fenster NICHT. Man landet im
+        BBC-BASIC-Prompt und kann Variablen inspizieren.
 
     uv run tools/run.py --headless --program hello.bas
-        CLI-Emulator, gleiche autoexec-Logik. Programm laeuft und beendet
-        sich idealerweise per PROC_dbg_exit; sonst greift --timeout.
+        CLI-Emulator. Programm sollte sich per PROC_dbg_exit beenden;
+        sonst greift --timeout.
 
     uv run tools/run.py --firmware quark -u
-        GUI-Emulator mit Quark MOS 1.04, ohne CPU-Limit.
+        GUI mit Quark MOS 1.04, ohne CPU-Limit.
 
     uv run tools/run.py --keyboard 0
         Keyboard-Layout ueberschreiben (0=UK, 1=US, 2=German default).
@@ -112,6 +116,36 @@ def resolve_program(program: str | None) -> Path | None:
     )
 
 
+def apply_hold_to_staged(program: str) -> None:
+    """Schaltet den Hold-Mode im gestagten Programm ein.
+
+    Sucht die HOLD-MARKER-Zeile in der (via `REM USES lib/debug` automatisch
+    mitgestagten) Library-Inline-Sektion und ersetzt `dbg_hold% = 0` durch
+    `dbg_hold% = TRUE`. Dann bleibt der Emulator nach PROC_dbg_exit offen
+    (der BASIC-Prompt erscheint, Variablen koennen inspiziert werden).
+
+    Naechstes `uv run tools/deploy.py` setzt den Normalzustand wieder.
+    """
+    staged = SDCARD_STAGED / "beispiele" / program
+    if not staged.exists():
+        log(
+            f"--hold: gestagte Datei fehlt ({staged}); "
+            "fuehre zuerst `uv run tools/deploy.py` aus."
+        )
+        return
+    text = staged.read_bytes().decode("utf-8", errors="replace")
+    marker = "31012 dbg_hold% = 0"
+    if marker not in text:
+        log(
+            "--hold: HOLD-MARKER nicht gefunden. Enthaelt das Programm "
+            "`REM USES lib/debug`? Nur mit inline-lib greift der Hold-Mode."
+        )
+        return
+    patched = text.replace(marker, "31012 dbg_hold% = TRUE", 1)
+    staged.write_bytes(patched.encode("utf-8"))
+    log(f"--hold: Hold-Mode in {staged.name} aktiviert")
+
+
 def write_autoexec(sdcard: Path, lines: list[str]) -> None:
     """Schreibt autoexec.txt mit LF-Zeilenenden (Pflicht!)."""
     content = "".join(line + "\n" for line in lines)
@@ -170,6 +204,9 @@ def run_gui(args: argparse.Namespace) -> int:
 
     write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program, args.keyboard))
 
+    if args.hold and args.program:
+        apply_hold_to_staged(args.program)
+
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
     # GUI-Default des Emulators ist 'platform' (MOS 3.x), wir setzen aber
     # immer explizit die vom CLI und unseren Tests bekannte 2.x-Variante.
@@ -188,7 +225,10 @@ def run_gui(args: argparse.Namespace) -> int:
         print()
         print("  +------------------------------------------------------------+")
         print(f"  | {args.program} startet automatisch im Emulator.".ljust(63) + "|")
-        print("  | Nach Ende zurueck am BBC-BASIC-Prompt (>).                  |")
+        if args.hold:
+            print("  | --hold aktiv: Fenster bleibt nach PROC_dbg_exit offen.      |")
+        else:
+            print("  | Nach Ende zurueck am BBC-BASIC-Prompt (>).                  |")
         print("  +------------------------------------------------------------+")
         print()
     return subprocess.call(cmd, cwd=emu_dir)
@@ -215,6 +255,9 @@ def run_headless(args: argparse.Namespace) -> int:
     # greift der --timeout.
     lines = build_gui_autoexec(args.program, args.keyboard)
     write_autoexec(SDCARD_STAGED, lines)
+
+    if args.hold and args.program:
+        apply_hold_to_staged(args.program)
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
     if args.unlimited_cpu:
@@ -268,6 +311,17 @@ def main() -> int:
         "--headless",
         action="store_true",
         help="CLI-Emulator (keine Grafik, text-only)",
+    )
+    parser.add_argument(
+        "--hold",
+        action="store_true",
+        help=(
+            "Emulator bleibt nach PROC_dbg_exit geoeffnet (setzt "
+            "dbg_hold% = TRUE im gestagten Programm). Nuetzlich fuer "
+            "interaktives Debuggen, wenn man nach einem ASSERT FAIL noch "
+            "Variablen inspizieren will. `uv run tools/deploy.py` setzt "
+            "den Normalzustand wieder."
+        ),
     )
     parser.add_argument(
         "--firmware",

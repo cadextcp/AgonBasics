@@ -15,6 +15,13 @@
 30130 REM   PROC_dbg_bp(id%)             Emulator-Breakpoint (OUT &10)
 30140 REM   PROC_dbg_regs(id%)           CPU-Zustand dumpen (OUT &20)
 30150 REM   PROC_dbg_exit(code%)         Emulator beenden (OUT &00)
+30151 REM                                Wenn dbg_hold% <> 0 gesetzt ist,
+30152 REM                                wird OUT NICHT aufgerufen - das
+30153 REM                                Programm endet mit END und der
+30154 REM                                BBC-BASIC-Prompt bleibt offen.
+30155 REM                                (fuer interaktives Debuggen;
+30156 REM                                 `uv run tools/run.py --hold`
+30157 REM                                 setzt die Variable automatisch.)
 30160 REM   FN_dbg_time                  Centisekunden seit Init
 30170 REM
 30180 REM Auf echter Hardware haben die Ports &00/&10/&20 keine Funktion
@@ -107,6 +114,10 @@
 30990 ENDPROC
 31000 :
 31010 DEF PROC_dbg_exit(code%)
+31012 dbg_hold% = 0 : REM HOLD-MARKER: --hold ersetzt "= 0" durch "= TRUE"
+31015 IF dbg_hold% = 0 THEN 31020
+31016 PROC_dbg_log("exit deferred (hold) code=" + STR$(code%))
+31017 END
 31020 IF dbg_exit% = 0 THEN PROC_dbg_asm
 31030 ?(dbg_exit% + 1) = code% AND &FF
 31040 PROC_dbg_log("exit code=" + STR$(code%))

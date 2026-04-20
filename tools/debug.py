@@ -19,7 +19,11 @@ Beispiele:
         GUI + Debugger, MOS-Prompt
 
     uv run tools/debug.py --program debug_demo.bas
-        GUI + Debugger, laedt beispiele/debug_demo.bas
+        GUI + Debugger, laedt + startet beispiele/debug_demo.bas
+
+    uv run tools/debug.py --program summe_bug.bas --hold
+        GUI + Debugger, Fenster bleibt nach PROC_dbg_exit offen
+        (fuer interaktives Variablen-Inspizieren nach einem ASSERT FAIL).
 
     uv run tools/debug.py -b 0x40000 -b 0x40100
         Startet mit zwei Adress-Breakpoints
@@ -40,15 +44,19 @@ def log(msg: str) -> None:
     print(f"[debug] {msg}", flush=True)
 
 
-def find_emulator_exe() -> Path:
+def _load_run_module():
     from importlib.util import spec_from_file_location, module_from_spec
 
     spec = spec_from_file_location("_run", ROOT / "tools" / "run.py")
     mod = module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(mod)  # type: ignore[union-attr]
-    emu_dir = mod.find_emulator_dir()
-    exe = emu_dir / mod.exe_name("fab-agon-emulator")
+    return mod
+
+
+def find_emulator_exe(run_mod) -> Path:
+    emu_dir = run_mod.find_emulator_dir()
+    exe = emu_dir / run_mod.exe_name("fab-agon-emulator")
     if not exe.exists():
         raise FileNotFoundError(exe)
     return exe
@@ -70,20 +78,15 @@ def write_autoexec_for_program(program: str | None, keyboard: int) -> None:
 
 
 def main() -> int:
-    # DEFAULT_KEYBOARD aus run.py wiederverwenden
-    from importlib.util import spec_from_file_location, module_from_spec
-
-    spec = spec_from_file_location("_run", ROOT / "tools" / "run.py")
-    run_mod = module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(run_mod)  # type: ignore[union-attr]
+    run_mod = _load_run_module()
     default_keyboard = run_mod.DEFAULT_KEYBOARD
+    default_firmware = run_mod.DEFAULT_FIRMWARE
 
     parser = argparse.ArgumentParser(description="AgonBasics debug")
     parser.add_argument(
         "--program",
         "-p",
-        help="BASIC-Programm aus beispiele/ (zum manuellen CHAINen im BASIC-Prompt)",
+        help="BASIC-Programm aus beispiele/ automatisch laden+starten",
     )
     parser.add_argument(
         "-b",
@@ -94,11 +97,22 @@ def main() -> int:
         help="Adress-Breakpoint (hex, z.B. 0x40000), mehrfach erlaubt",
     )
     parser.add_argument(
+        "--hold",
+        action="store_true",
+        help=(
+            "Emulator bleibt nach PROC_dbg_exit geoeffnet (setzt "
+            "dbg_hold% = TRUE im gestagten Programm). Nuetzlich, um nach "
+            "einem ASSERT FAIL im BBC-BASIC-Prompt Variablen zu "
+            "inspizieren. `uv run tools/deploy.py` setzt den Normalzustand "
+            "wieder her."
+        ),
+    )
+    parser.add_argument(
         "--firmware",
         choices=["console8", "quark", "electron", "fb"],
-        default="console8",
+        default=default_firmware,
         help=(
-            "MOS/VDP-Variante (default: console8 = MOS 2.3.3). "
+            f"MOS/VDP-Variante (default: {default_firmware} = MOS 2.3.3). "
             "GUI-Default des Emulators waere 'platform' (MOS 3.x); "
             "2.3.3 ist konsistent zum CLI und gegen autoexec getestet."
         ),
@@ -130,7 +144,7 @@ def main() -> int:
         return 1
 
     try:
-        exe = find_emulator_exe()
+        exe = find_emulator_exe(run_mod)
     except FileNotFoundError as e:
         log(f"GUI-Emulator nicht gefunden: {e}")
         return 1
@@ -146,6 +160,9 @@ def main() -> int:
 
     write_autoexec_for_program(args.program, args.keyboard)
 
+    if args.hold and args.program:
+        run_mod.apply_hold_to_staged(args.program)
+
     cmd = [
         str(exe),
         "--sdcard",
@@ -154,8 +171,8 @@ def main() -> int:
     ]
     for bp in args.breakpoint:
         cmd += ["-b", bp]
-    if args.firmware:
-        cmd += ["--firmware", args.firmware]
+    # Immer explizit setzen: GUI-Default waere platform (MOS 3.x), wir wollen console8.
+    cmd += ["--firmware", args.firmware]
     if args.unlimited_cpu:
         cmd.append("-u")
     if args.extra_args:
@@ -169,6 +186,8 @@ def main() -> int:
     print("  | PROC_dbg_bp(id%) in lib/debug.bas.                          |")
     if args.program:
         print(f"  | {args.program} startet automatisch im Emulator.".ljust(63) + "|")
+    if args.hold:
+        print("  | --hold aktiv: Fenster bleibt nach PROC_dbg_exit offen.      |")
     print("  +------------------------------------------------------------+")
     print()
 
