@@ -74,6 +74,38 @@ def exe_name(base: str) -> str:
     return base
 
 
+def resolve_program(program: str | None) -> Path | None:
+    """Prueft, ob `program` in beispiele/ oder lib/ existiert.
+
+    Gibt den Pfad der Quelle zurueck (fuer Info-Logs) bzw. None, wenn kein
+    Programm angegeben wurde. Wirft FileNotFoundError mit hilfreicher Liste,
+    wenn angegeben aber nicht vorhanden.
+    """
+    if not program:
+        return None
+
+    candidates = [
+        ROOT / "beispiele" / program,
+        ROOT / "lib" / program,
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+
+    available = sorted(
+        [p.name for p in (ROOT / "beispiele").glob("*.bas")]
+        + [p.name for p in (ROOT / "lib").glob("*.bas")]
+    )
+    hint = "\n  ".join(available) if available else "(keine)"
+    raise FileNotFoundError(
+        f"Programm '{program}' nicht gefunden.\n"
+        f"  Gesucht in: beispiele/{program}, lib/{program}\n"
+        f"  Verfuegbar:\n  {hint}\n"
+        f"  Tipp: Dateiname muss inklusive .bas-Endung angegeben werden,\n"
+        f"  z. B. `--program hello.bas`."
+    )
+
+
 def write_autoexec(sdcard: Path, lines: list[str]) -> None:
     """Schreibt autoexec.txt mit LF-Zeilenenden (Pflicht!)."""
     content = "".join(line + "\n" for line in lines)
@@ -154,6 +186,14 @@ def run_headless(args: argparse.Namespace) -> int:
     if not exe.exists():
         log(f"CLI-Emulator nicht gefunden: {exe}")
         return 1
+
+    try:
+        src = resolve_program(args.program)
+    except FileNotFoundError as e:
+        log(str(e))
+        return 2
+    if src is not None:
+        log(f"Programm-Quelle: {src.relative_to(ROOT)}")
 
     # Headless = dieselbe autoexec-Logik wie GUI; das Programm laedt und
     # startet sich selbst. Ohne --program landen wir am BBC-BASIC-Prompt.

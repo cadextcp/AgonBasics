@@ -129,6 +129,15 @@ def main() -> int:
         log(f"GUI-Emulator nicht gefunden: {e}")
         return 1
 
+    # Pre-Flight: existiert das Programm in beispiele/ oder lib/?
+    try:
+        src = run_mod.resolve_program(args.program)
+    except FileNotFoundError as e:
+        log(str(e))
+        return 2
+    if src is not None:
+        log(f"Programm-Quelle: {src.relative_to(run_mod.ROOT)}")
+
     write_autoexec_for_program(args.program, args.keyboard)
 
     cmd = [
