@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AgonBasics: current .bas in Debugger",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "uv run tools/debug.py --program ${fileBasename}",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "AgonBasics: headless current .bas",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "uv run tools/run.py --headless --program ${fileBasename}",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

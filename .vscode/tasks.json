@@ -1,0 +1,111 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "AgonBasics: Setup",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/setup.py"],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "detail": "Laedt fab-agon-emulator und stagt die SD-Karte (einmalig)"
+        },
+        {
+            "label": "AgonBasics: Deploy",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/deploy.py"],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Kopiert beispiele/ und lib/ in die gestagte SD-Karte"
+        },
+        {
+            "label": "AgonBasics: Run (GUI)",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/run.py"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "detail": "Oeffnet den GUI-Emulator mit der gestagten SD-Karte"
+        },
+        {
+            "label": "AgonBasics: Run current .bas (GUI)",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/deploy.py", "&&", "uv", "run", "tools/run.py", "--program", "${fileBasename}"],
+            "options": {
+                "shell": {
+                    "executable": "pwsh",
+                    "args": ["-NoProfile", "-Command"]
+                }
+            },
+            "problemMatcher": [],
+            "detail": "Deploy + GUI-Start; im BBC-BASIC-Prompt CHAIN \"<datei>\" eingeben"
+        },
+        {
+            "label": "AgonBasics: Run current .bas (headless)",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/run.py", "--headless", "--program", "${fileBasename}"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "detail": "Laeuft das aktuelle .bas headless im CLI-Emulator"
+        },
+        {
+            "label": "AgonBasics: Debug (eZ80 debugger)",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/debug.py", "--program", "${fileBasename}"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            },
+            "detail": "Startet den Emulator mit -d; Debug-Kommandos im Terminal"
+        },
+        {
+            "label": "AgonBasics: Test",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/test.py"],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "detail": "Headless-Tests aus tests/test_*.bas laufen lassen"
+        },
+        {
+            "label": "AgonBasics: Deploy to physical SD",
+            "type": "shell",
+            "command": "uv",
+            "args": ["run", "tools/deploy_sdcard.py", "${input:sdTarget}"],
+            "problemMatcher": [],
+            "detail": "Dry-Run gegen echten microSD-Leser (F:, G:, ...). Mit --confirm erneut ausfuehren fuer tatsaechliches Kopieren."
+        }
+    ],
+    "inputs": [
+        {
+            "id": "sdTarget",
+            "type": "promptString",
+            "description": "Ziel-Laufwerksbuchstabe der microSD-Karte (z.B. F:)",
+            "default": "F:"
+        }
+    ]
+}

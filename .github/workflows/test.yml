@@ -1,0 +1,45 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Headless BBC-BASIC Tests (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.13"
+
+      - name: Setup (Emulator + SD-Karte)
+        run: uv run tools/setup.py --no-interactive
+        shell: pwsh
+
+      - name: Deploy Beispiele und Library
+        run: uv run tools/deploy.py
+        shell: pwsh
+
+      - name: Run tests
+        run: uv run tools/test.py --verbose
+        shell: pwsh
+
+      - name: Upload stdout on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-stdout
+          path: |
+            sdcard/staged/beispiele/test_*.bas
+            emulator/download/
+          retention-days: 7

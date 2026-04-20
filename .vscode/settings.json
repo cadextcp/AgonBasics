@@ -1,0 +1,27 @@
+{
+    "files.eol": "\r\n",
+    "files.associations": {
+        "*.bas": "vb",
+        "autoexec.txt": "plaintext"
+    },
+    "[python]": {
+        "editor.tabSize": 4,
+        "files.eol": "\n"
+    },
+    "[markdown]": {
+        "files.eol": "\n"
+    },
+    "[yaml]": {
+        "files.eol": "\n"
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        ".venv": true,
+        "emulator": true,
+        "sdcard/staged": true
+    },
+    "search.exclude": {
+        "emulator": true,
+        "sdcard/staged": true
+    }
+}

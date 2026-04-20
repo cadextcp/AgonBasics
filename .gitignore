@@ -1,4 +1,25 @@
+# Build output
 target/
 *.o
 *.bin
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Vom Setup heruntergeladener/entpackter Emulator (nicht committen)
+emulator/
+
+# Gestagte SD-Karte (Popup MOS + eigene Beispiele) - wird von tools/setup.py erzeugt
+sdcard/staged/
+
+# Editor
+.idea/
+*.swp
