@@ -47,6 +47,12 @@ EMU_ROOT_LINUX = ROOT / "emulator" / "fab-agon-emulator-v1.1.3-linux-x86_64"
 # Ueberschreibbar per --keyboard N.
 DEFAULT_KEYBOARD = 2
 
+# Default-Firmware fuer den GUI-Emulator. Der GUI-Emulator waehlt von sich
+# aus 'platform' (MOS 3.x), der CLI-Emulator immer Console8 MOS 2.3.3. Damit
+# GUI und CLI das gleiche Verhalten zeigen (und unsere autoexec.txt passt),
+# erzwingen wir console8 im GUI-Pfad. Der CLI ignoriert --firmware eh.
+DEFAULT_FIRMWARE = "console8"
+
 
 def log(msg: str) -> None:
     print(f"[run] {msg}", flush=True)
@@ -154,6 +160,14 @@ def run_gui(args: argparse.Namespace) -> int:
         log(f"GUI-Emulator nicht gefunden: {exe}")
         return 1
 
+    try:
+        src = resolve_program(args.program)
+    except FileNotFoundError as e:
+        log(str(e))
+        return 2
+    if src is not None:
+        log(f"Programm-Quelle: {src.relative_to(ROOT)}")
+
     write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program, args.keyboard))
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
@@ -173,9 +187,8 @@ def run_gui(args: argparse.Namespace) -> int:
     if args.program:
         print()
         print("  +------------------------------------------------------------+")
-        print("  | Im BBC-BASIC-Prompt (>) bitte eingeben:                    |")
-        print(f'  |   *CD beispiele'.ljust(63) + "|")
-        print(f'  |   CHAIN "{args.program}"'.ljust(63) + "|")
+        print(f"  | {args.program} startet automatisch im Emulator.".ljust(63) + "|")
+        print("  | Nach Ende zurueck am BBC-BASIC-Prompt (>).                  |")
         print("  +------------------------------------------------------------+")
         print()
     return subprocess.call(cmd, cwd=emu_dir)
@@ -259,7 +272,12 @@ def main() -> int:
     parser.add_argument(
         "--firmware",
         choices=["console8", "quark", "electron", "fb"],
-        help="MOS/VDP-Variante (default: console8)",
+        default=DEFAULT_FIRMWARE,
+        help=(
+            f"MOS/VDP-Variante fuer GUI-Mode (default: {DEFAULT_FIRMWARE} = MOS 2.3.3). "
+            "GUI-Default des Emulators waere 'platform' (MOS 3.x), aber 2.3.3 "
+            "ist konsistent zum CLI-Emulator und gegen autoexec.txt getestet."
+        ),
     )
     parser.add_argument(
         "-u",
