@@ -55,9 +55,15 @@ def find_emulator_exe() -> Path:
 
 
 def write_autoexec_for_program(program: str | None, keyboard: int) -> None:
-    # Start bbcbasic aus dem Root; *CD + CHAIN tippt der Nutzer selbst
-    # (siehe Hinweis im Terminal).
-    lines = [f"SET KEYBOARD {keyboard}", "bin/bbcbasic"]
+    # Dieselbe 3-Zeilen-Logik wie run.py: mit --program wird das Programm
+    # automatisch geladen und gestartet; ohne --program landet man am
+    # BBC-BASIC-Prompt.
+    lines = [f"SET KEYBOARD {keyboard}"]
+    if program:
+        lines.append("cd beispiele")
+        lines.append(f"/bin/bbcbasic {program}")
+    else:
+        lines.append("/bin/bbcbasic")
     autoexec = SDCARD_STAGED / "autoexec.txt"
     autoexec.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     log(f"autoexec.txt fuer Debug-Run geschrieben ({len(lines)} Zeilen)")
@@ -147,7 +153,7 @@ def main() -> int:
     print("  | Befehlsuebersicht. Emulator-Breakpoints aus BASIC via       |")
     print("  | PROC_dbg_bp(id%) in lib/debug.bas.                          |")
     if args.program:
-        print(f'  | Im BBC-BASIC-Prompt: CHAIN "{args.program}"'.ljust(63) + "|")
+        print(f"  | {args.program} startet automatisch im Emulator.".ljust(63) + "|")
     print("  +------------------------------------------------------------+")
     print()
 

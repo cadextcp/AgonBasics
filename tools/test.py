@@ -107,21 +107,19 @@ def stage_test(deploy_mod, test_bas: Path) -> None:
 
 
 def run_single(run_mod, exe: Path, emu_dir: Path, test_name: str, timeout: float) -> str:
+    # autoexec.txt treibt den ganzen Run: cd beispiele + /bin/bbcbasic <file>
+    # BBC BASIC fuer Agon lädt und startet die Datei automatisch. Der Test
+    # muss sich selbst per PROC_dbg_exit(rc) beenden.
+    lines = run_mod.build_gui_autoexec(test_name)
+    run_mod.write_autoexec(SDCARD_STAGED, lines)
+
     cmd = [
         str(exe),
         "--sdcard",
         str(SDCARD_STAGED.resolve()),
     ]
-    stdin_lines = [
-        ".",
-        "bin/bbcbasic",
-        "*CD beispiele",
-        f'CHAIN "{test_name}"',
-        "",
-        "",
-        "",
-    ]
-    stdin_text = "\n".join(stdin_lines) + "\n"
+    # Minimaler stdin-Puffer fuer Programme, die INPUT/GET aufrufen.
+    stdin_text = "\n" * 8
 
     proc = subprocess.Popen(
         cmd,

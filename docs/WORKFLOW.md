@@ -93,20 +93,25 @@ Exit-Code beendet.)
 
 ### Arbeitsverzeichnis im Emulator
 
-Sowohl GUI als auch Headless starten `bin/bbcbasic` vom SD-Karten-Root.
-Damit ein Programm seine Assets per relativem Pfad laden kann
-(z. B. `sprite.bas`: `OPENIN "ship.rgba"`), wechselt der Headless-Pfad
-vor dem `CHAIN` automatisch mit `*CD beispiele` ins Beispielverzeichnis.
-
-**Im GUI-Modus** muss der Nutzer das selbst im BBC-BASIC-Prompt tippen:
+Sowohl GUI als auch Headless starten das Programm ueber eine generierte
+`autoexec.txt` mit drei Zeilen:
 
 ```
-> *CD beispiele
-> CHAIN "sprite.bas"
+SET KEYBOARD 2
+cd beispiele
+/bin/bbcbasic <programm.bas>
 ```
 
-`tools/run.py --program X.bas` gibt die zwei Zeilen beim Start als
-Hinweis im Terminal aus.
+MOS wechselt ins `beispiele/`, startet BBC BASIC (vom absoluten Pfad
+`/bin/bbcbasic`, weil `..` in MOS 2.x nicht unterstuetzt wird) und
+uebergibt den Dateinamen. BBC BASIC fuer Agon interpretiert das erste
+Argument als LOAD+RUN-Datei - das Programm startet also **automatisch**.
+
+Im GUI-Fenster steht das Programm sofort da, ohne dass man am
+BBC-BASIC-Prompt etwas tippen muss. `tools/debug.py` verwendet dieselbe
+autoexec, zusaetzlich mit `-d` fuer den eZ80-Debugger.
+
+Ohne `--program` landet man am BBC-BASIC-Prompt und kann dort tippen.
 
 ## Tests schreiben
 

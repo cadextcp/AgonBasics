@@ -8,16 +8,15 @@ Startet den Agon-Emulator (GUI oder headless) mit der gestagten SD-Karte.
 
 Beispiele:
     uv run tools/run.py
-        GUI-Emulator oeffnen, MOS-Prompt.
+        GUI-Emulator oeffnen, direkt am BBC-BASIC-Prompt.
 
     uv run tools/run.py --program hello.bas
-        GUI-Emulator oeffnen, BBC-BASIC-Prompt.
-        Im BASIC-Prompt: `*CD beispiele` + `CHAIN "hello.bas"` tippen.
+        GUI-Emulator oeffnen, hello.bas laedt und startet automatisch
+        (autoexec: SET KEYBOARD 2 / cd beispiele / /bin/bbcbasic hello.bas).
 
     uv run tools/run.py --headless --program hello.bas
-        CLI-Emulator, pipet `bin/bbcbasic`, `*CD beispiele`,
-        `CHAIN "hello.bas"` in stdin. Bricht nach --timeout Sekunden ab,
-        falls das Programm nicht selbst beendet (PROC_dbg_exit).
+        CLI-Emulator, gleiche autoexec-Logik. Programm laeuft und beendet
+        sich idealerweise per PROC_dbg_exit; sonst greift --timeout.
 
     uv run tools/run.py --firmware quark -u
         GUI-Emulator mit Quark MOS 1.04, ohne CPU-Limit.
@@ -93,14 +92,27 @@ def restore_default_autoexec(sdcard: Path, keyboard: int = DEFAULT_KEYBOARD) -> 
 def build_gui_autoexec(
     program: str | None, keyboard: int = DEFAULT_KEYBOARD
 ) -> list[str]:
-    """Autoexec fuer GUI-Mode. Startet BBC BASIC vom Root.
+    """Autoexec-Zeilen fuer eine BASIC-Session.
 
-    Anmerkung: 'cd beispiele' + 'bin/bbcbasic' wuerde MOS in beispiele/
-    hinterlassen, wo bin/bbcbasic nicht existiert. Wir starten daher
-    bbcbasic aus Root; der Nutzer tippt im BASIC-Prompt selber
-    *CD beispiele und CHAIN "programm.bas".
+    Ohne --program: nur Keyboard + bbcbasic -> MOS-Prompt -> BBC-BASIC-Prompt.
+    Mit --program: wechselt ins beispiele/ und uebergibt den Dateinamen an
+    bbcbasic. BBC BASIC fuer Agon interpretiert das erste Argument als
+    LOAD+RUN-Datei, daher startet das Programm automatisch.
+
+    Der `cd beispiele`-Schritt sorgt dafuer, dass das Programm seine Assets
+    per relativem Pfad laden kann (z. B. sprite.bas: OPENIN "ship.rgba").
+
+    Der fuehrende Slash bei `/bin/bbcbasic` ist ein absoluter Pfad vom
+    SD-Karten-Root; er funktioniert auch nach `cd beispiele`. MOS 2.x
+    unterstuetzt `..` im Pfad nicht.
     """
-    return [f"SET KEYBOARD {keyboard}", "bin/bbcbasic"]
+    lines = [f"SET KEYBOARD {keyboard}"]
+    if program:
+        lines.append("cd beispiele")
+        lines.append(f"/bin/bbcbasic {program}")
+    else:
+        lines.append("/bin/bbcbasic")
+    return lines
 
 
 def run_gui(args: argparse.Namespace) -> int:
@@ -143,32 +155,24 @@ def run_headless(args: argparse.Namespace) -> int:
         log(f"CLI-Emulator nicht gefunden: {exe}")
         return 1
 
-    # Headless: wir pipen stdin und erwarten, dass das Programm selbst via
-    # PROC_dbg_exit beendet. Ein Default-autoexec darf nichts unerwartetes
-    # tun ausser Keyboard setzen.
-    restore_default_autoexec(SDCARD_STAGED, args.keyboard)
+    # Headless = dieselbe autoexec-Logik wie GUI; das Programm laedt und
+    # startet sich selbst. Ohne --program landen wir am BBC-BASIC-Prompt.
+    # Programme sollten sich selbst via PROC_dbg_exit(rc) beenden, sonst
+    # greift der --timeout.
+    lines = build_gui_autoexec(args.program, args.keyboard)
+    write_autoexec(SDCARD_STAGED, lines)
 
     cmd = [str(exe), "--sdcard", str(SDCARD_STAGED.resolve())]
     if args.unlimited_cpu:
         cmd.append("-u")
 
-    stdin_lines: list[str] = []
-    # Erste Zeile wird beim Boot verschluckt (dummy), darum ein "."
-    stdin_lines.append(".")
-    stdin_lines.append("bin/bbcbasic")
-    if args.program:
-        # Arbeitsverzeichnis auf beispiele/ setzen (via BBC-BASIC Star-Cmd),
-        # damit das Programm seine Assets per relativem Pfad laden kann
-        # (z. B. sprite.bas: OPENIN "ship.rgba").
-        stdin_lines.append("*CD beispiele")
-        stdin_lines.append(f'CHAIN "{args.program}"')
-    # ein paar leere Zeilen als Timing-Puffer fuer bbcbasic-Start
-    stdin_lines += [""] * 3
-    stdin_text = "\n".join(stdin_lines) + "\n"
+    # ein paar leere Zeilen in stdin als Timing-Puffer - falls das Programm
+    # INPUT/GET erwartet, verschluckt es diese Leereingaben statt zu hangen.
+    stdin_text = "\n" * 8
 
     log(f"Starte headless: {' '.join(repr(c) for c in cmd)}")
-    log(f"stdin ({len(stdin_lines)} Zeilen):")
-    for ln in stdin_lines:
+    log(f"autoexec ({len(lines)} Zeilen):")
+    for ln in lines:
         log(f"  | {ln}")
 
     try:

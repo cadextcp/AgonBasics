@@ -14,9 +14,8 @@ cd AgonBasics
 # Emulator und SD-Karte einrichten (~8 MB Download)
 uv run tools/setup.py
 
-# Ein Beispiel ausfuehren
+# Ein Beispiel ausfuehren (laedt und startet automatisch)
 uv run tools/run.py --program hello.bas
-# Im BBC-BASIC-Prompt tippen:   CHAIN "hello.bas"
 
 # Headless / scriptbar
 uv run tools/run.py --headless --program hello.bas
