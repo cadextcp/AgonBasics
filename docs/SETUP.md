@@ -137,3 +137,20 @@ Release zu wechseln:
 2. `EMU_VERSION` und den Eintrag in `EMU_ASSETS["windows_x64"]` in
    `tools/setup.py` aktualisieren.
 3. `uv run tools/setup.py --force` ausfuehren.
+
+## Offline-Doku mit ziehen
+
+Optional, aber empfohlen fuer Arbeit ohne Internet:
+
+```
+uv run tools/fetch_docs.py
+```
+
+Klont die offizielle Agon-Platform-Doku (<https://github.com/AgonPlatform/agon-docs>)
+nach `docs/agon-platform-docs/` (gitignored). Danach in VS Code:
+
+```
+code docs/agon-platform-docs/
+```
+
+Details: [RESOURCES.md](RESOURCES.md) und [FAQ](https://agonplatform.github.io/agon-docs/FAQ/).

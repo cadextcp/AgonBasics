@@ -19,6 +19,11 @@
 30180 REM Auf echter Hardware haben die Ports &00/&10/&20 keine Funktion
 30190 REM (im eZ80F92 unbelegt) - Code bleibt kompatibel, aber ohne
 30200 REM Debugger-Effekt.
+30205 REM
+30206 REM Hintergrund:
+30207 REM   Debug-I/O-Ports       https://github.com/tomm/fab-agon-emulator#debug-io-space
+30208 REM   MOS-API (RST 08h)     https://agonplatform.github.io/agon-docs/mos/API/
+30209 REM   System Variables      https://agonplatform.github.io/agon-docs/mos/System-Variables/
 30210 REM ===============================================================
 30220 :
 30230 DEF PROC_dbg_init(log$)

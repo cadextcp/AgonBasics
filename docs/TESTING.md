@@ -143,3 +143,10 @@ uv run tools/test.py --verbose
 ```
 
 Ein Test-Fehler -> Workflow schlaegt fehl.
+
+## Weiterlesen
+
+- [BBC Basic for Agon](https://agonplatform.github.io/agon-docs/BBC-BASIC-for-Agon/) - Sprachreferenz fuer Testkoerper
+- [Programming](https://agonplatform.github.io/agon-docs/Programming/) - was sich testen laesst und was nicht
+- [REFERENCE.md](REFERENCE.md) - `STR$`, `ERR`/`ERL`, VDU/PLOT-Codes
+- [DEBUGGING.md](DEBUGGING.md) - die Debug-Ebenen, die man in Tests mischen kann

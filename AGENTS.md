@@ -110,3 +110,31 @@ Siehe `.gitignore`.
 
 Die Versionen und SHA-256-Pruefsummen stehen in `tools/setup.py`. Upgrades
 erfolgen dort.
+
+## Offizielle Referenz-Doku
+
+Die **kanonische Quelle** fuer alles, was nicht in diesem Repo
+dokumentiert ist:
+
+- Rendered: <https://agonplatform.github.io/agon-docs/>
+- Source (GitHub): <https://github.com/AgonPlatform/agon-docs>
+- Offline: `uv run tools/fetch_docs.py` legt einen git-Clone unter
+  `docs/agon-platform-docs/` an (gitignored).
+
+Daily-driver Seiten:
+
+- MOS API           <https://agonplatform.github.io/agon-docs/mos/API/>
+- VDU Commands      <https://agonplatform.github.io/agon-docs/vdp/VDU-Commands/>
+- PLOT Commands     <https://agonplatform.github.io/agon-docs/vdp/PLOT-Commands/>
+- Screen Modes      <https://agonplatform.github.io/agon-docs/vdp/Screen-Modes/>
+- BBC Basic         <https://agonplatform.github.io/agon-docs/BBC-BASIC-for-Agon/>
+- Theory of op.     <https://agonplatform.github.io/agon-docs/Theory-of-operation/>
+
+Lokale Zusammenstellung mit Links: `docs/RESOURCES.md`.
+Lokaler Spickzettel: `docs/REFERENCE.md`.
+
+**Regel fuer Agenten/Mitwirkende:** Bei Aenderungen am Funktionsverhalten
+immer zuerst die offizielle Doku konsultieren. Wenn das Verhalten auf dem
+Agon dort anders dokumentiert ist als im Repo implementiert, gilt die
+offizielle Doku als Referenz - Implementierung anpassen, nicht die Doku
+"hinbiegen".

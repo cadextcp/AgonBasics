@@ -185,3 +185,14 @@ Deshalb: **derselbe Code laeuft auf Emulator UND Board**.
 `PROC_dbg_exit(1)` entsprechend mit 1 (Fehler). Der Headless-CLI-Emulator
 uebernimmt diesen Wert als Prozess-Exit-Code - darauf bauen
 `tools/test.py` und die CI auf.
+
+## Weiterfuehrende Doku
+
+Die offizielle Agon-Platform-Doku hat tiefere Referenzen:
+
+- [MOS API (RST 08h, Syscalls)](https://agonplatform.github.io/agon-docs/mos/API/) - relevant fuer alles was tiefer als BASIC ist
+- [MOS System Variables](https://agonplatform.github.io/agon-docs/mos/System-Variables/) - SYSVARS-Block, Echtzeit-Uhr, Tastatur-State
+- [Theory of operation](https://agonplatform.github.io/agon-docs/Theory-of-operation/) - Architektur eZ80 + ESP32, hilft beim Verstaendnis der Adressraeume
+- [fab-agon-emulator Debug-I/O](https://github.com/tomm/fab-agon-emulator#debug-io-space) - die drei Ports `&00/&10/&20`, wie sie intern funktionieren
+- Quick-Lookup lokal: [REFERENCE.md](REFERENCE.md) (MOS-Syscalls, VDU-Codes, Speicherkarte)
+- Kompletter Doku-Baum: [RESOURCES.md](RESOURCES.md)

@@ -123,3 +123,23 @@ uv run tools/run.py -- --verbose --border ff0000
 3. Task "AgonBasics: Run current .bas (GUI)" oder "(headless)" starten.
 4. Fehler? Task "AgonBasics: Debug" (eZ80-Debugger).
 5. Tests: Task "AgonBasics: Test" (Ctrl+Shift+P, "Run Test Task").
+
+## Referenz fuer die BASIC-Sprache
+
+Fuer alles, was ueber die Beispiele hinausgeht:
+
+- [BBC Basic for Agon](https://agonplatform.github.io/agon-docs/BBC-BASIC-for-Agon/) -
+  offizielle Sprachreferenz (Agon-spezifische Erweiterungen)
+- [Programming](https://agonplatform.github.io/agon-docs/Programming/) -
+  Einstieg, wie man fuer Agon programmiert (Sprachenuebersicht)
+- [VDU Commands](https://agonplatform.github.io/agon-docs/vdp/VDU-Commands/) +
+  [PLOT Commands](https://agonplatform.github.io/agon-docs/vdp/PLOT-Commands/) +
+  [Screen Modes](https://agonplatform.github.io/agon-docs/vdp/Screen-Modes/) -
+  fuer Grafik und MODE
+- [Bitmaps and Sprites API](https://agonplatform.github.io/agon-docs/vdp/Bitmaps-API/) -
+  unser `sprite.bas` nutzt genau das
+- [Enhanced Audio API](https://agonplatform.github.io/agon-docs/vdp/Enhanced-Audio-API/) -
+  fuer Sound ueber die rudimentaere `SOUND`-Anweisung hinaus
+
+Lokaler Spickzettel mit den wichtigsten Befehlen: [REFERENCE.md](REFERENCE.md).
+Kompletter Link-Baum: [RESOURCES.md](RESOURCES.md).

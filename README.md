@@ -69,6 +69,7 @@ Fuer die Installation von `uv` und alles weitere siehe
 | `uv run tools/test.py` | Headless-Tests aus `tests/` |
 | `uv run tools/deploy_sdcard.py F: --confirm` | Auf echte microSD kopieren |
 | `uv run tools/make_ship.py` | Beispiel-Asset (16x16 Sprite) erzeugen |
+| `uv run tools/fetch_docs.py` | Offizielle Agon-Doku lokal spiegeln |
 
 ## Debuggen
 

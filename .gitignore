@@ -20,6 +20,9 @@ emulator/
 # Gestagte SD-Karte (Popup MOS + eigene Beispiele) - wird von tools/setup.py erzeugt
 sdcard/staged/
 
+# Offline-Mirror der offiziellen Doku - wird von tools/fetch_docs.py erzeugt
+docs/agon-platform-docs/
+
 # Editor
 .idea/
 *.swp
