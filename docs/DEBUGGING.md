@@ -83,6 +83,27 @@ Der Patch überlebt nur bis zum nächsten `uv run tools/deploy.py`
 **Nicht benutzen** in automatisierten Tests — dort soll
 `PROC_dbg_exit` den Emulator wirklich beenden.
 
+### Syntax-Smoke-Test fuer Grafik-Programme
+
+Sobald ein Programm `MODE 8` aufruft, verschluckt der Fake-VDP des
+CLI-Emulators alle Syntax-Fehlermeldungen (sie gehen als VDU-Bytes an
+die Grafik statt auf stdout). Das macht headless-Debugging muehsam.
+
+Workaround: **alle PROCs vor `MODE` einmal aufrufen**. So crasht das
+Programm in stdout, bevor die VDP die Ausgabe schluckt. Beispiel dafuer:
+`beispiele/breakout_smoke.bas` — laedt die gleichen Globals wie
+`breakout.bas`, ruft aber jede PROC einmal mit Dummy-Parametern auf
+und beendet mit `=== TEST PASS ===`.
+
+Typischer Ablauf beim Entwickeln eines Grafik-Spiels:
+
+1. Logik in Prozeduren kapseln.
+2. Ein `_smoke.bas` schreiben, das die Globals initialisiert und alle
+   PROCs einmal anruft (ohne MODE).
+3. `uv run tools/run.py --headless --program spiel_smoke.bas` →
+   zeigt Syntax-Fehler direkt auf stdout.
+4. Wenn gruen: `uv run tools/run.py --program spiel.bas` im GUI.
+
 ### Beispiel
 
 ```

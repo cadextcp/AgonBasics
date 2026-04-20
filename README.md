@@ -56,6 +56,9 @@ Fuer die Installation von `uv` und alles weitere siehe
 | `sprite.bas` | Hardware-Sprite laden und mit WASD bewegen |
 | `timer.bas` | 20-Minuten-Countdown mit Regenbogen-Animation |
 | `debug_demo.bas` | Demonstriert `lib/debug.bas` (PROC_dbg_trace, _bp, _exit) |
+| `summe_bug.bas` | Intentional-buggy Fakultaet - fuer die Debug-Uebung aus docs/DEBUGGING.md |
+| `breakout.bas` | Einfaches Breakout-Spiel (MODE 8, A/D bewegt Paddle, ESC beendet) |
+| `breakout_smoke.bas` | Syntax-Smoke-Test fuer breakout - ruft alle PROCs ohne MODE, fuer headless-Debug |
 
 ## Tooling
 
