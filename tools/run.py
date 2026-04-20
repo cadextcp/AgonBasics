@@ -113,10 +113,11 @@ def run_gui(args: argparse.Namespace) -> int:
     log(f"Starte: {' '.join(repr(c) for c in cmd)}")
     if args.program:
         print()
-        print("  +--------------------------------------------------------+")
-        print(f"  | Im BBC-BASIC-Prompt (>) bitte eingeben:                |")
-        print(f'  |   CHAIN "{args.program}"'.ljust(57) + " |")
-        print("  +--------------------------------------------------------+")
+        print("  +------------------------------------------------------------+")
+        print("  | Im BBC-BASIC-Prompt (>) bitte eingeben:                    |")
+        print(f'  |   *CD beispiele'.ljust(63) + "|")
+        print(f'  |   CHAIN "{args.program}"'.ljust(63) + "|")
+        print("  +------------------------------------------------------------+")
         print()
     return subprocess.call(cmd, cwd=emu_dir)
 
@@ -140,13 +141,13 @@ def run_headless(args: argparse.Namespace) -> int:
     stdin_lines: list[str] = []
     # Erste Zeile wird beim Boot verschluckt (dummy), darum ein "."
     stdin_lines.append(".")
+    stdin_lines.append("bin/bbcbasic")
     if args.program:
-        # Wir bleiben im Root, damit bin/bbcbasic auflösbar ist;
-        # der Pfad zur BASIC-Datei wird relativ angegeben.
-        stdin_lines.append("bin/bbcbasic")
-        stdin_lines.append(f'CHAIN "beispiele/{args.program}"')
-    else:
-        stdin_lines.append("bin/bbcbasic")
+        # Arbeitsverzeichnis auf beispiele/ setzen (via BBC-BASIC Star-Cmd),
+        # damit das Programm seine Assets per relativem Pfad laden kann
+        # (z. B. sprite.bas: OPENIN "ship.rgba").
+        stdin_lines.append("*CD beispiele")
+        stdin_lines.append(f'CHAIN "{args.program}"')
     # ein paar leere Zeilen als Timing-Puffer fuer bbcbasic-Start
     stdin_lines += [""] * 3
     stdin_text = "\n".join(stdin_lines) + "\n"

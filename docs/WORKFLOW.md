@@ -91,6 +91,23 @@ PROC_dbg_exit(0)
 (aus `lib/debug.bas`; aktiviert `OUT (&00), A`, was den Emulator mit
 Exit-Code beendet.)
 
+### Arbeitsverzeichnis im Emulator
+
+Sowohl GUI als auch Headless starten `bin/bbcbasic` vom SD-Karten-Root.
+Damit ein Programm seine Assets per relativem Pfad laden kann
+(z. B. `sprite.bas`: `OPENIN "ship.rgba"`), wechselt der Headless-Pfad
+vor dem `CHAIN` automatisch mit `*CD beispiele` ins Beispielverzeichnis.
+
+**Im GUI-Modus** muss der Nutzer das selbst im BBC-BASIC-Prompt tippen:
+
+```
+> *CD beispiele
+> CHAIN "sprite.bas"
+```
+
+`tools/run.py --program X.bas` gibt die zwei Zeilen beim Start als
+Hinweis im Terminal aus.
+
 ## Tests schreiben
 
 Siehe [TESTING.md](TESTING.md).

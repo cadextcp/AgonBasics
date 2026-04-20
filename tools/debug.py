@@ -55,10 +55,9 @@ def find_emulator_exe() -> Path:
 
 
 def write_autoexec_for_program(program: str | None) -> None:
-    lines = ["SET KEYBOARD 1"]
-    if program:
-        lines.append("cd beispiele")
-        lines.append("bin/bbcbasic")
+    # Start bbcbasic aus dem Root; *CD + CHAIN tippt der Nutzer selbst
+    # (siehe Hinweis im Terminal).
+    lines = ["SET KEYBOARD 1", "bin/bbcbasic"]
     autoexec = SDCARD_STAGED / "autoexec.txt"
     autoexec.write_bytes(("\n".join(lines) + "\n").encode("utf-8"))
     log(f"autoexec.txt fuer Debug-Run geschrieben ({len(lines)} Zeilen)")

@@ -115,7 +115,8 @@ def run_single(run_mod, exe: Path, emu_dir: Path, test_name: str, timeout: float
     stdin_lines = [
         ".",
         "bin/bbcbasic",
-        f'CHAIN "beispiele/{test_name}"',
+        "*CD beispiele",
+        f'CHAIN "{test_name}"',
         "",
         "",
         "",
