@@ -10,7 +10,8 @@
 30090 REM   PROC_dbg_close               Logdatei schliessen
 30100 REM   PROC_dbg_trace(lbl$, val)    Traceausgabe "[t] lbl = val"
 30110 REM   PROC_dbg_log(msg$)           Freie Textzeile ausgeben+loggen
-30120 REM   PROC_dbg_assert(cond, msg$)  Bei cond=0: Fehler 17 werfen
+30120 REM   PROC_dbg_assert(cond, msg$)  Bei cond=0: PRINT msg$, === TEST FAIL ===,
+30125 REM                                Emulator mit exit-code 1 beenden
 30130 REM   PROC_dbg_bp(id%)             Emulator-Breakpoint (OUT &10)
 30140 REM   PROC_dbg_regs(id%)           CPU-Zustand dumpen (OUT &20)
 30150 REM   PROC_dbg_exit(code%)         Emulator beenden (OUT &00)
@@ -86,8 +87,9 @@
 30800 DEF PROC_dbg_assert(cond, msg$)
 30810 IF cond THEN ENDPROC
 30820 PROC_dbg_log("ASSERT FAIL: " + msg$)
-30830 ERROR 17, "Assertion failed: " + msg$
-30840 ENDPROC
+30830 PRINT "=== TEST FAIL ==="
+30840 PROC_dbg_exit(1)
+30845 ENDPROC
 30850 :
 30860 DEF PROC_dbg_bp(id%)
 30870 REM Patcht die LD A,n Konstante und ruft dann das Snippet auf.

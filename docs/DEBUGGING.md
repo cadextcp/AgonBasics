@@ -48,7 +48,7 @@ bevor sie in die SD-Karte gelangt.
 | `PROC_dbg_close` | Logfile schliessen (meist nicht noetig) |
 | `PROC_dbg_log("msg")` | freie Textzeile, Zeitstempel wird angefuegt |
 | `PROC_dbg_trace("x%", x%)` | Variable labeln und loggen |
-| `PROC_dbg_assert(cond, "msg")` | bei `cond=0` wird `ERROR 17` geworfen |
+| `PROC_dbg_assert(cond, "msg")` | bei `cond=0`: `msg` loggen, `=== TEST FAIL ===` drucken, Emulator mit Exit-Code 1 beenden |
 | `FN_dbg_time` | Centisekunden seit `PROC_dbg_init` |
 
 ### Beispiel
