@@ -9,6 +9,7 @@ Kopiert den BASIC-Quelltext des Projekts in die gestagte SD-Karte.
 Quellen:
     beispiele/   -> sdcard/staged/beispiele/
     lib/         -> sdcard/staged/beispiele/
+    schulung/    -> sdcard/staged/beispiele/ (Lerngruppen-Iterationen)
     tests/*.bas  -> sdcard/staged/beispiele/ (nur auf Wunsch)
 
 Regeln:
@@ -41,6 +42,7 @@ STAGE_SUBDIR = "beispiele"  # alles landet in sdcard/staged/beispiele/
 SOURCE_DIRS = [
     ROOT / "beispiele",
     ROOT / "lib",
+    ROOT / "schulung",
 ]
 
 LIB_DEBUG = ROOT / "lib" / "debug.bas"

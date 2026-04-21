@@ -85,7 +85,7 @@ def exe_name(base: str) -> str:
 
 
 def resolve_program(program: str | None) -> Path | None:
-    """Prueft, ob `program` in beispiele/ oder lib/ existiert.
+    """Prueft, ob `program` in beispiele/, lib/ oder schulung/ existiert.
 
     Gibt den Pfad der Quelle zurueck (fuer Info-Logs) bzw. None, wenn kein
     Programm angegeben wurde. Wirft FileNotFoundError mit hilfreicher Liste,
@@ -97,6 +97,7 @@ def resolve_program(program: str | None) -> Path | None:
     candidates = [
         ROOT / "beispiele" / program,
         ROOT / "lib" / program,
+        ROOT / "schulung" / program,
     ]
     for c in candidates:
         if c.exists():
@@ -105,11 +106,12 @@ def resolve_program(program: str | None) -> Path | None:
     available = sorted(
         [p.name for p in (ROOT / "beispiele").glob("*.bas")]
         + [p.name for p in (ROOT / "lib").glob("*.bas")]
+        + [p.name for p in (ROOT / "schulung").glob("*.bas")]
     )
     hint = "\n  ".join(available) if available else "(keine)"
     raise FileNotFoundError(
         f"Programm '{program}' nicht gefunden.\n"
-        f"  Gesucht in: beispiele/{program}, lib/{program}\n"
+        f"  Gesucht in: beispiele/{program}, lib/{program}, schulung/{program}\n"
         f"  Verfuegbar:\n  {hint}\n"
         f"  Tipp: Dateiname muss inklusive .bas-Endung angegeben werden,\n"
         f"  z. B. `--program hello.bas`."

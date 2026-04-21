@@ -28,11 +28,12 @@ BASIC-Debug-Bibliothek und einen Headless-Testrunner.
 ```
 beispiele/    BASIC-Beispielprogramme (CRLF)
 lib/          Wiederverwendbare BASIC-Bibliotheken (debug.bas etc.)
+schulung/     Lerngruppen-Iterationen (Breakout in Schritten aufgebaut)
 tests/        Automatische BASIC-Tests + expected/ Referenzausgaben
 tools/        Python-Tooling (uv run, inline-deps PEP 723)
 docs/         Deutsche Dokumentation
 emulator/     (gitignored) Vom Setup entpackter Emulator
-sdcard/staged/(gitignored) Zusammengefuegte SD-Karte: Popup MOS + beispiele + lib
+sdcard/staged/(gitignored) Zusammengefuegte SD-Karte: Popup MOS + beispiele + lib + schulung
 ```
 
 ## Tastatur-Default
