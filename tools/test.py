@@ -128,6 +128,8 @@ def run_single(run_mod, exe: Path, emu_dir: Path, test_name: str, timeout: float
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         bufsize=1,
     )
     try:
@@ -184,6 +186,10 @@ def _short_diff(expected: str, actual: str) -> str:
 
 
 def main() -> int:
+    # stdout robust machen gegen VDU-Noise (siehe run.py)
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
+
     parser = argparse.ArgumentParser(description="AgonBasics test runner")
     parser.add_argument("--filter", default=None)
     parser.add_argument("--timeout", type=float, default=25.0)

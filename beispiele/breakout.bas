@@ -50,44 +50,7 @@
 480 :
 490 REM === Haupt-Loop ===
 510 REPEAT
-520   oldPX% = padX%
-530   oldBX% = ballX%
-540   oldBY% = ballY%
-550   :
-560   REM --- Input ---
-570   k% = INKEY(0)
-580   IF k% = ASC("a") OR k% = ASC("A") THEN padX% = padX% - padSpd%
-590   IF k% = ASC("d") OR k% = ASC("D") THEN padX% = padX% + padSpd%
-600   IF k% = 27 THEN quit% = TRUE
-610   IF padX% < 0 THEN padX% = 0
-620   IF padX% + padW% > scrW% THEN padX% = scrW% - padW%
-630   :
-640   REM --- Ball bewegen ---
-650   ballX% = ballX% + ballDX%
-660   ballY% = ballY% + ballDY%
-670   :
-680   REM --- Wand-Kollisionen (jeweils eigener PROC, weil BBC BASIC Z80 ---
-685   REM bei IF cond THEN stmt1 : stmt2 nur stmt1 konditional ausfuehrt) ---
-690   IF ballX% < ballR% THEN PROC_bounce_left
-700   IF ballX% > scrW% - ballR% THEN PROC_bounce_right
-710   IF ballY% > scrH% - ballR% THEN PROC_bounce_top
-720   :
-730   REM --- Boden verlassen = Leben ab ---
-740   IF ballY% < 0 THEN PROC_ball_verloren
-750   :
-760   REM --- Paddle-Kollision ---
-770   IF ballDY% < 0 AND ballY% <= padY% + padH% + ballR% AND ballY% >= padY% - ballR% AND ballX% >= padX% - ballR% AND ballX% <= padX% + padW% + ballR% THEN PROC_paddle_hit
-780   :
-790   REM --- Block-Kollision ---
-800   PROC_block_hit
-810   :
-820   REM --- Redraw nur Ball + Paddle ---
-830   PROC_erase_rect(oldPX%, padY%, padW%, padH%)
-840   PROC_erase_rect(oldBX% - ballR%, oldBY% - ballR%, 2 * ballR%, 2 * ballR%)
-850   GCOL 0, 7 : PROC_fill_rect(padX%, padY%, padW%, padH%)
-860   GCOL 0, 3 : PROC_fill_rect(ballX% - ballR%, ballY% - ballR%, 2 * ballR%, 2 * ballR%)
-870   :
-880   WAIT 2
+512   PROC_game_tick
 890 UNTIL quit% OR lives% <= 0 OR blkLeft% <= 0
 900 :
 910 VDU 23, 1, 1
@@ -188,3 +151,45 @@
 1870 ballY% = scrH% - ballR%
 1880 ballDY% = -ABS(ballDY%)
 1890 ENDPROC
+1900 :
+1910 DEF PROC_game_tick
+1920 LOCAL k%
+1930 oldPX% = padX%
+1940 oldBX% = ballX%
+1950 oldBY% = ballY%
+1960 :
+1970 REM --- Input ---
+1980 k% = INKEY(0)
+1990 IF k% = ASC("a") OR k% = ASC("A") THEN padX% = padX% - padSpd%
+2000 IF k% = ASC("d") OR k% = ASC("D") THEN padX% = padX% + padSpd%
+2010 IF k% = 27 THEN quit% = TRUE
+2020 IF padX% < 0 THEN padX% = 0
+2030 IF padX% + padW% > scrW% THEN padX% = scrW% - padW%
+2040 :
+2050 REM --- Ball bewegen ---
+2060 ballX% = ballX% + ballDX%
+2070 ballY% = ballY% + ballDY%
+2080 :
+2090 REM --- Wand-Kollisionen ---
+2100 IF ballX% < ballR% THEN PROC_bounce_left
+2110 IF ballX% > scrW% - ballR% THEN PROC_bounce_right
+2120 IF ballY% > scrH% - ballR% THEN PROC_bounce_top
+2130 :
+2140 REM --- Boden verlassen = Leben ab ---
+2150 IF ballY% < 0 THEN PROC_ball_verloren
+2160 :
+2170 REM --- Paddle-Kollision ---
+2180 IF ballDY% < 0 AND ballY% <= padY% + padH% + ballR% AND ballY% >= padY% - ballR% AND ballX% >= padX% - ballR% AND ballX% <= padX% + padW% + ballR% THEN PROC_paddle_hit
+2190 :
+2200 REM --- Block-Kollision ---
+2210 PROC_block_hit
+2220 :
+2230 REM --- Redraw nur Ball + Paddle ---
+2240 PROC_erase_rect(oldPX%, padY%, padW%, padH%)
+2250 PROC_erase_rect(oldBX% - ballR%, oldBY% - ballR%, 2 * ballR%, 2 * ballR%)
+2260 GCOL 0, 7 : PROC_fill_rect(padX%, padY%, padW%, padH%)
+2270 GCOL 0, 3 : PROC_fill_rect(ballX% - ballR%, ballY% - ballR%, 2 * ballR%, 2 * ballR%)
+2280 :
+2290 REM --- auf VSync warten (OSBYTE 19, einziges unterstuetztes OSBYTE auf Agon) ---
+2300 *FX 19
+2310 ENDPROC

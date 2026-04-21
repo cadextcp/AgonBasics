@@ -44,6 +44,8 @@
 430 PROC_block_hit
 440 PROC_dbg_log("smoke: PROC_draw_blocks")
 450 PROC_draw_blocks
+452 PROC_dbg_log("smoke: PROC_game_tick (exekutiert 1x die Main-Loop)")
+454 PROC_game_tick
 460 :
 470 PRINT "=== TEST PASS ==="
 480 PROC_dbg_exit(0)
@@ -139,3 +141,29 @@
 1390 ballY% = scrH% - ballR%
 1400 ballDY% = -ABS(ballDY%)
 1410 ENDPROC
+1420 :
+1430 DEF PROC_game_tick
+1440 LOCAL k%
+1450 oldPX% = padX%
+1460 oldBX% = ballX%
+1470 oldBY% = ballY%
+1480 k% = INKEY(0)
+1490 IF k% = ASC("a") OR k% = ASC("A") THEN padX% = padX% - padSpd%
+1500 IF k% = ASC("d") OR k% = ASC("D") THEN padX% = padX% + padSpd%
+1510 IF k% = 27 THEN quit% = TRUE
+1520 IF padX% < 0 THEN padX% = 0
+1530 IF padX% + padW% > scrW% THEN padX% = scrW% - padW%
+1540 ballX% = ballX% + ballDX%
+1550 ballY% = ballY% + ballDY%
+1560 IF ballX% < ballR% THEN PROC_bounce_left
+1570 IF ballX% > scrW% - ballR% THEN PROC_bounce_right
+1580 IF ballY% > scrH% - ballR% THEN PROC_bounce_top
+1590 IF ballY% < 0 THEN PROC_ball_verloren
+1600 IF ballDY% < 0 AND ballY% <= padY% + padH% + ballR% AND ballY% >= padY% - ballR% AND ballX% >= padX% - ballR% AND ballX% <= padX% + padW% + ballR% THEN PROC_paddle_hit
+1610 PROC_block_hit
+1620 PROC_erase_rect(oldPX%, padY%, padW%, padH%)
+1630 PROC_erase_rect(oldBX% - ballR%, oldBY% - ballR%, 2 * ballR%, 2 * ballR%)
+1640 GCOL 0, 7 : PROC_fill_rect(padX%, padY%, padW%, padH%)
+1650 GCOL 0, 3 : PROC_fill_rect(ballX% - ballR%, ballY% - ballR%, 2 * ballR%, 2 * ballR%)
+1660 *FX 19
+1670 ENDPROC

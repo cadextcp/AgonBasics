@@ -280,6 +280,8 @@ def run_headless(args: argparse.Namespace) -> int:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             bufsize=1,
         )
     except FileNotFoundError as e:
@@ -301,6 +303,12 @@ def run_headless(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
+    # stdout so konfigurieren, dass unbekannte Bytes (z.B. VDU-packet-Noise
+    # vom Emulator) nicht crashen - sonst bricht print() unter Windows mit
+    # UnicodeEncodeError ab, sobald der CLI-Emulator non-cp1252-Bytes ausgibt.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
+
     parser = argparse.ArgumentParser(description="AgonBasics run")
     parser.add_argument(
         "--program",
