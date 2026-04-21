@@ -28,12 +28,6 @@ Dann eine Iteration interaktiv starten:
 uv run tools/run.py --program 01_paddle.bas
 ```
 
-Reinen Syntax-Check (Smoke-Test, beendet sich selbst):
-
-```
-uv run tools/run.py --headless --program 01_paddle_smoke.bas
-```
-
 ## Design-Entscheidungen
 
 - Jede Iteration ist eine **eigene, selbststaendig lauffaehige Datei**.
