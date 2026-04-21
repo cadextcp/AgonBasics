@@ -9,6 +9,7 @@
 80 scrW% = 1280 : scrH% = 1024
 90 padW% = 200 : padH% = 24 : padY% = 80
 100 padX% = (scrW% - padW%) / 2
+105 padSpd% = 40
 110 ballR% = 16
 120 ballX% = scrW% / 2 : ballY% = scrH% / 3
 130 ballDX% = 16 : ballDY% = -16
@@ -20,7 +21,7 @@
 190 blkYTop% = scrH% - 60
 200 FOR c% = 0 TO nCols% - 1 : FOR r% = 0 TO nRows% - 1 : blocks%(c%, r%) = 1 : NEXT : NEXT
 210 blkLeft% = nCols% * nRows%
-220 score% = 0 : lives% = 3
+220 score% = 0 : lives% = 3 : quit% = FALSE
 230 PROC_dbg_log("smoke: globals ok")
 240 :
 250 REM --- PROC-Aufrufe (ohne MODE, also keine echten VDU-Effekte) ---
@@ -54,116 +55,116 @@
 510 REM === hier folgt der PROC-Anteil aus breakout.bas ===
 520 :
 530 DEF PROC_fill_rect(x%, y%, w%, h%)
-540 MOVE x%, y%
-550 PLOT 101, x% + w%, y% + h%
+540   MOVE x%, y%
+550   PLOT 101, x% + w%, y% + h%
 560 ENDPROC
 570 :
 580 DEF PROC_erase_rect(x%, y%, w%, h%)
-590 GCOL 0, 0
-600 PROC_fill_rect(x%, y%, w%, h%)
+590   GCOL 0, 0
+600   PROC_fill_rect(x%, y%, w%, h%)
 610 ENDPROC
 620 :
 630 DEF PROC_draw_blocks
-640 LOCAL c%, r%
-650 FOR c% = 0 TO nCols% - 1
-660   FOR r% = 0 TO nRows% - 1
-670     IF blocks%(c%, r%) = 1 THEN PROC_draw_block(c%, r%)
-680   NEXT
-690 NEXT
+640   LOCAL c%, r%
+650   FOR c% = 0 TO nCols% - 1
+660     FOR r% = 0 TO nRows% - 1
+670       IF blocks%(c%, r%) = 1 THEN PROC_draw_block(c%, r%)
+680     NEXT
+690   NEXT
 700 ENDPROC
 710 :
 720 DEF PROC_draw_block(c%, r%)
-730 LOCAL bx%, by%, col%
-740 bx% = c% * (blkW% + blkGap%) + blkGap% / 2
-750 by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
-760 col% = 1 + (r% MOD 6)
-770 GCOL 0, col%
-780 PROC_fill_rect(bx%, by%, blkW%, blkH%)
+730   LOCAL bx%, by%, col%
+740   bx% = c% * (blkW% + blkGap%) + blkGap% / 2
+750   by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
+760   col% = 1 + (r% MOD 6)
+770   GCOL 0, col%
+780   PROC_fill_rect(bx%, by%, blkW%, blkH%)
 790 ENDPROC
 800 :
 810 DEF PROC_ball_verloren
-820 lives% = lives% - 1
-830 ballX% = scrW% / 2
-840 ballY% = scrH% / 3
-850 ballDX% = 16
-860 ballDY% = -16
+820   lives% = lives% - 1
+830   ballX% = scrW% / 2
+840   ballY% = scrH% / 3
+850   ballDX% = 16
+860   ballDY% = -16
 870 ENDPROC
 880 :
 890 DEF PROC_paddle_hit
-900 LOCAL rel%
-910 ballDY% = ABS(ballDY%)
-920 ballY% = padY% + padH% + ballR% + 1
-930 rel% = ballX% - (padX% + padW% / 2)
-940 ballDX% = rel% / 6
-950 IF ballDX% = 0 THEN ballDX% = 4
-960 IF ballDX% > 28 THEN ballDX% = 28
-970 IF ballDX% < -28 THEN ballDX% = -28
+900   LOCAL rel%
+910   ballDY% = ABS(ballDY%)
+920   ballY% = padY% + padH% + ballR% + 1
+930   rel% = ballX% - (padX% + padW% / 2)
+940   ballDX% = rel% / 6
+950   IF ballDX% = 0 THEN ballDX% = 4
+960   IF ballDX% > 28 THEN ballDX% = 28
+970   IF ballDX% < -28 THEN ballDX% = -28
 980 ENDPROC
 990 :
 1000 DEF PROC_block_hit
-1010 LOCAL c%, r%, bx%, by%
-1020 FOR c% = 0 TO nCols% - 1
-1030   FOR r% = 0 TO nRows% - 1
-1040     IF blocks%(c%, r%) = 0 THEN 1140
-1050     bx% = c% * (blkW% + blkGap%) + blkGap% / 2
-1060     by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
-1070     IF ballX% + ballR% < bx% THEN 1140
-1080     IF ballX% - ballR% > bx% + blkW% THEN 1140
-1090     IF ballY% + ballR% < by% THEN 1140
-1100     IF ballY% - ballR% > by% + blkH% THEN 1140
-1110     PROC_block_destroy(c%, r%)
-1120     r% = nRows% : c% = nCols%
-1140   NEXT
-1150 NEXT
+1010   LOCAL c%, r%, bx%, by%
+1020   FOR c% = 0 TO nCols% - 1
+1030     FOR r% = 0 TO nRows% - 1
+1040       IF blocks%(c%, r%) = 0 THEN 1140
+1050       bx% = c% * (blkW% + blkGap%) + blkGap% / 2
+1060       by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
+1070       IF ballX% + ballR% < bx% THEN 1140
+1080       IF ballX% - ballR% > bx% + blkW% THEN 1140
+1090       IF ballY% + ballR% < by% THEN 1140
+1100       IF ballY% - ballR% > by% + blkH% THEN 1140
+1110       PROC_block_destroy(c%, r%)
+1120       r% = nRows% : c% = nCols%
+1140     NEXT
+1150   NEXT
 1160 ENDPROC
 1170 :
 1180 DEF PROC_block_destroy(c%, r%)
-1190 LOCAL bx%, by%
-1200 bx% = c% * (blkW% + blkGap%) + blkGap% / 2
-1210 by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
-1220 blocks%(c%, r%) = 0
-1230 blkLeft% = blkLeft% - 1
-1240 score% = score% + 10
-1250 ballDY% = -ballDY%
+1190   LOCAL bx%, by%
+1200   bx% = c% * (blkW% + blkGap%) + blkGap% / 2
+1210   by% = blkYTop% - r% * (blkH% + blkGap%) - blkH%
+1220   blocks%(c%, r%) = 0
+1230   blkLeft% = blkLeft% - 1
+1240   score% = score% + 10
+1250   ballDY% = -ballDY%
 1260 ENDPROC
 1270 :
 1280 DEF PROC_bounce_left
-1290 ballX% = ballR%
-1300 ballDX% = ABS(ballDX%)
+1290   ballX% = ballR%
+1300   ballDX% = ABS(ballDX%)
 1310 ENDPROC
 1320 :
 1330 DEF PROC_bounce_right
-1340 ballX% = scrW% - ballR%
-1350 ballDX% = -ABS(ballDX%)
+1340   ballX% = scrW% - ballR%
+1350   ballDX% = -ABS(ballDX%)
 1360 ENDPROC
 1370 :
 1380 DEF PROC_bounce_top
-1390 ballY% = scrH% - ballR%
-1400 ballDY% = -ABS(ballDY%)
+1390   ballY% = scrH% - ballR%
+1400   ballDY% = -ABS(ballDY%)
 1410 ENDPROC
 1420 :
 1430 DEF PROC_game_tick
-1440 LOCAL k%
-1450 oldPX% = padX%
-1460 oldBX% = ballX%
-1470 oldBY% = ballY%
-1480 k% = INKEY(0)
-1490 IF k% = ASC("a") OR k% = ASC("A") THEN padX% = padX% - padSpd%
-1500 IF k% = ASC("d") OR k% = ASC("D") THEN padX% = padX% + padSpd%
-1510 IF k% = 27 THEN quit% = TRUE
-1520 IF padX% < 0 THEN padX% = 0
-1530 IF padX% + padW% > scrW% THEN padX% = scrW% - padW%
-1540 ballX% = ballX% + ballDX%
-1550 ballY% = ballY% + ballDY%
-1560 IF ballX% < ballR% THEN PROC_bounce_left
-1570 IF ballX% > scrW% - ballR% THEN PROC_bounce_right
-1580 IF ballY% > scrH% - ballR% THEN PROC_bounce_top
-1590 IF ballY% < 0 THEN PROC_ball_verloren
-1600 IF ballDY% < 0 AND ballY% <= padY% + padH% + ballR% AND ballY% >= padY% - ballR% AND ballX% >= padX% - ballR% AND ballX% <= padX% + padW% + ballR% THEN PROC_paddle_hit
-1610 PROC_block_hit
-1620 PROC_erase_rect(oldPX%, padY%, padW%, padH%)
-1630 PROC_erase_rect(oldBX% - ballR%, oldBY% - ballR%, 2 * ballR%, 2 * ballR%)
-1640 GCOL 0, 7 : PROC_fill_rect(padX%, padY%, padW%, padH%)
-1650 GCOL 0, 3 : PROC_fill_rect(ballX% - ballR%, ballY% - ballR%, 2 * ballR%, 2 * ballR%)
-1660 *FX 19
+1440   LOCAL k%
+1450   oldPX% = padX%
+1460   oldBX% = ballX%
+1470   oldBY% = ballY%
+1480   k% = INKEY(0)
+1490   IF INKEY(-66) THEN padX% = padX% - padSpd%
+1500   IF INKEY(-51) THEN padX% = padX% + padSpd%
+1510   IF k% = 27 THEN quit% = TRUE
+1520   IF padX% < 0 THEN padX% = 0
+1530   IF padX% + padW% > scrW% THEN padX% = scrW% - padW%
+1540   ballX% = ballX% + ballDX%
+1550   ballY% = ballY% + ballDY%
+1560   IF ballX% < ballR% THEN PROC_bounce_left
+1570   IF ballX% > scrW% - ballR% THEN PROC_bounce_right
+1580   IF ballY% > scrH% - ballR% THEN PROC_bounce_top
+1590   IF ballY% < 0 THEN PROC_ball_verloren
+1600   IF ballDY% < 0 AND ballY% <= padY% + padH% + ballR% AND ballY% >= padY% - ballR% AND ballX% >= padX% - ballR% AND ballX% <= padX% + padW% + ballR% THEN PROC_paddle_hit
+1610   PROC_block_hit
+1620   PROC_erase_rect(oldPX%, padY%, padW%, padH%)
+1630   PROC_erase_rect(oldBX% - ballR%, oldBY% - ballR%, 2 * ballR%, 2 * ballR%)
+1640   GCOL 0, 7 : PROC_fill_rect(padX%, padY%, padW%, padH%)
+1650   GCOL 0, 3 : PROC_fill_rect(ballX% - ballR%, ballY% - ballR%, 2 * ballR%, 2 * ballR%)
+1660   *FX 19
 1670 ENDPROC
