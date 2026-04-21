@@ -9,10 +9,11 @@ man sich auf ein Konzept konzentrieren kann.
 | #  | Datei                  | Was dazukommt                          |
 |----|------------------------|----------------------------------------|
 | 01 | `01_paddle.bas`        | MODE 8, Game-Loop, Paddle-Bewegung     |
-| 02 | (kommt spaeter)        | Ball bewegen und an Waenden abprallen  |
-| 03 | (kommt spaeter)        | Paddle-Ball-Kollision                  |
-| 04 | (kommt spaeter)        | Ziegel-Array + Kollision               |
-| 05 | (kommt spaeter)        | Punkte, Leben, Game-Over               |
+| 02 | `02_paddle_sprite.bas` | Paddle als Bitmap-Sprite statt PLOT-Rechteck (VDU 23,27, sped-Asset) |
+| 03 | (kommt spaeter)        | Ball bewegen und an Waenden abprallen  |
+| 04 | (kommt spaeter)        | Paddle-Ball-Kollision                  |
+| 05 | (kommt spaeter)        | Ziegel-Array + Kollision               |
+| 06 | (kommt spaeter)        | Punkte, Leben, Game-Over               |
 
 ## Aufruf
 
@@ -26,7 +27,12 @@ Dann eine Iteration interaktiv starten:
 
 ```
 uv run tools/run.py --program 01_paddle.bas
+uv run tools/run.py --program 02_paddle_sprite.bas
 ```
+
+Iteration 02 braucht zusaetzlich die Asset-Datei
+`schulung/02_paddle.rgba` (mit `tools/sped.py` erstellt; Details in
+[`02_paddle_sprite.md`](02_paddle_sprite.md)).
 
 ## Design-Entscheidungen
 
@@ -57,5 +63,7 @@ Hintergrund zu `INKEY(-N)` steht in `../docs/REFERENCE.md#tastatur`.
 ## Siehe auch
 
 - [`01_paddle.md`](01_paddle.md) - detaillierte Erklaerung zu Iteration 01
+- [`02_paddle_sprite.md`](02_paddle_sprite.md) - Iteration 02 (Sprite-API, sped-Asset)
 - [`../beispiele/breakout.bas`](../beispiele/breakout.bas) - das fertige Spiel
+- [`../beispiele/sprite.bas`](../beispiele/sprite.bas) - Referenz-Beispiel fuer Bitmap-Sprites
 - [`../docs/REFERENCE.md`](../docs/REFERENCE.md) - Spickzettel (VDU/PLOT/Scancodes)
