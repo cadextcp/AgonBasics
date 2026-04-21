@@ -87,10 +87,16 @@ eigener BBC-BASIC-Grammatik. Einmalige Installation:
 uv run tools/install_vscode_extension.py
 ```
 
-Danach VS Code neu laden (Ctrl+Shift+P -> "Developer: Reload Window");
-`.bas`-Dateien zeigen jetzt REM-Kommentare, Zeilennummern, Keywords,
-PROC-Aufrufe, Hex-Zahlen und Strings farblich getrennt an. Details +
-Farb-Anpassung: [`tools/vscode-bbcbasic/README.md`](tools/vscode-bbcbasic/README.md).
+Danach VS Code neu laden (Ctrl+Shift+P -> "Developer: Reload Window").
+Die Extension bietet:
+
+- **Syntax-Highlighting**: REMs, Zeilennummern, Keywords, Strings, Hex.
+- **Go to Definition** (Strg+Klick auf `PROC_foo` / `FN_bar` springt
+  zum passenden `DEF`, workspace-weit).
+- **Outline / Go to Symbol** (Ctrl+Shift+O listet alle PROCs/FNs).
+- **Toggle Line Comment** (Ctrl+/) setzt `REM` am Zeilenanfang.
+
+Details + Farb-Anpassung: [`tools/vscode-bbcbasic/README.md`](tools/vscode-bbcbasic/README.md).
 
 ## Debuggen
 

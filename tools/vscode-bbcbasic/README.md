@@ -4,6 +4,19 @@ Schlankes Syntax-Highlighting fuer BBC-BASIC-Quelltext (`.bas`), wie er
 im AgonBasics-Projekt benutzt wird. Zielt auf BBC BASIC Z80 3.00 auf
 Agon Light / Console8 — deshalb heisst die Extension `bbcbasic-agon`.
 
+## Features
+
+- **Syntax-Highlighting**: REM-Kommentare, Zeilennummern, Strings,
+  Hex-Zahlen, Keywords (IF/FOR/REPEAT/DEF/...), IO-Befehle (VDU/MODE/
+  GCOL/PLOT/...), Star-Commands (`*FX`, `*CD`), PROC-/FN-Aufrufe.
+- **Go to Definition** (Strg+Klick): Klick auf einen `PROC_tick`- oder
+  `FN_dbg_time`-Aufruf springt zur passenden `DEF`-Zeile. Sucht zuerst
+  im aktuellen Dokument, dann workspace-weit in allen `.bas`-Dateien
+  (ausser `sdcard/staged/`, wo auto-inlined Library-Kopien liegen).
+- **Outline / Go to Symbol** (Ctrl+Shift+O): listet alle PROCs und
+  FNs einer Datei.
+- **Toggle Line Comment** (Ctrl+/): setzt/entfernt `REM` am Zeilenanfang.
+
 ## Warum nicht einfach "Visual Basic"?
 
 VS Code liefert eine VB-Grammatik mit, die bei File-Association
@@ -39,10 +52,32 @@ und im Workspace ist `.bas` automatisch als `bbcbasic` registriert.
 ## Deinstallation
 
 ```
-rm -rf ~/.vscode/extensions/bbcbasic-agon-0.0.1
+uv run tools/install_vscode_extension.py --uninstall
+```
+
+Oder manuell:
+
+```
+rm -rf ~/.vscode/extensions/bbcbasic-agon-*
 ```
 
 Oder via VS Code: Extensions-Panel → "BBC BASIC (Agon)" → Uninstall.
+
+## Struktur der Extension
+
+```
+tools/vscode-bbcbasic/
+├── package.json                       Extension-Manifest (main, contributes, ...)
+├── language-configuration.json        Comment-Marker, Brackets, Word-Pattern
+├── extension.js                       Provider fuer Go-to-Def + Outline
+├── syntaxes/
+│   └── bbcbasic.tmLanguage.json       TextMate-Grammar (die Farben)
+└── README.md                          diese Datei
+```
+
+`extension.js` ist pure JavaScript (kein TypeScript-Build, keine
+npm-Dependencies). Laesst sich mit `node --check extension.js` auf
+Syntaxfehler pruefen.
 
 ## Farbe anpassen
 

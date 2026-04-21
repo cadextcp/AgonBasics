@@ -59,9 +59,13 @@ def install(target_dir: Path) -> int:
     version = read_version()
     dst = target_dir / f"bbcbasic-agon-{version}"
 
-    if dst.exists():
-        log(f"Entferne alte Version: {dst}")
-        rmtree(dst)
+    # Alte Installationen (auch andere Versionen) entfernen, sonst liegen
+    # z. B. bbcbasic-agon-0.0.1 und bbcbasic-agon-0.1.0 parallel und VS Code
+    # laedt nicht-deterministisch die "falsche".
+    for old in sorted(target_dir.glob("bbcbasic-agon-*")):
+        log(f"Entferne alte Installation: {old}")
+        rmtree(old)
+
     dst.parent.mkdir(parents=True, exist_ok=True)
     copytree(SRC, dst)
 
