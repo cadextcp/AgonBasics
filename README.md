@@ -34,8 +34,9 @@ Fuer die Installation von `uv` und alles weitere siehe
 | `beispiele/` | BBC-BASIC-Beispielprogramme (`hello`, `sprite`, `timer`, `assembler`, `melodie`, `debug_demo`, ...) |
 | `lib/` | `debug.bas` - Trace-/Assert-/Breakpoint-Library (funktioniert Emulator UND Hardware) |
 | `schulung/` | Lerngruppen-Iterationen (Breakout schrittweise aufgebaut, jede Iteration selbststaendig) |
+| `werkzeuge/` | Agon-seitige BASIC-Werkzeuge: `sprite_editor/sped.bas` (von robogeek42, MIT) |
 | `tests/` | `test_*.bas` + erwartete Ausgaben fuer `tools/test.py` |
-| `tools/` | Python-Skripte: `setup`, `deploy`, `run`, `debug`, `test`, `deploy_sdcard`, `make_ship`, `install_vscode_extension` |
+| `tools/` | Python-Skripte: `setup`, `deploy`, `run`, `debug`, `test`, `deploy_sdcard`, `make_ship`, `install_vscode_extension`, `sped` |
 | `tools/vscode-bbcbasic/` | Lokale VS-Code-Extension: Syntax-Highlighting fuer `.bas` (REM, Keywords, Strings) |
 | `docs/` | Deutsche Dokumentation: Setup, Workflow, Debugging, Testing, Resources |
 | `.vscode/` | VS-Code-Tasks und -Launch-Configs |
@@ -75,6 +76,21 @@ Fuer die Installation von `uv` und alles weitere siehe
 | `uv run tools/make_ship.py` | Beispiel-Asset (16x16 Sprite) erzeugen |
 | `uv run tools/fetch_docs.py` | Offizielle Agon-Doku lokal spiegeln |
 | `uv run tools/install_vscode_extension.py` | BBC-BASIC-Syntax-Highlighting in VS Code aktivieren |
+| `uv run tools/sped.py` | Sprite-Editor SPED starten (deployt + oeffnet den Editor) |
+
+## Sprite-Editor SPED
+
+`werkzeuge/sprite_editor/sped.bas` ist ein vollwertiger Bitmap-Sprite-Editor
+fuer den Agon, uebernommen von [robogeek42/agon_sped](https://github.com/robogeek42/agon_sped)
+(MIT-lizenziert). Unterstuetzt 8x8 oder 16x16 Sprites, bis zu 24/48 Frames
+als Animation, Export als RGB888/RGBA8888/RGBA2222 oder BBC-BASIC-DATA-
+Zeilen. Start:
+
+```
+uv run tools/sped.py
+```
+
+Details + Tastaturbelegung: [`werkzeuge/sprite_editor/README.md`](werkzeuge/sprite_editor/README.md).
 
 ## VS Code / Syntax-Highlighting
 

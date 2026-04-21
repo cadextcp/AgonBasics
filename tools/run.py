@@ -85,7 +85,8 @@ def exe_name(base: str) -> str:
 
 
 def resolve_program(program: str | None) -> Path | None:
-    """Prueft, ob `program` in beispiele/, lib/ oder schulung/ existiert.
+    """Prueft, ob `program` in beispiele/, lib/, schulung/ oder
+    werkzeuge/ existiert.
 
     Gibt den Pfad der Quelle zurueck (fuer Info-Logs) bzw. None, wenn kein
     Programm angegeben wurde. Wirft FileNotFoundError mit hilfreicher Liste,
@@ -94,6 +95,7 @@ def resolve_program(program: str | None) -> Path | None:
     if not program:
         return None
 
+    # direkte Matches zuerst
     candidates = [
         ROOT / "beispiele" / program,
         ROOT / "lib" / program,
@@ -103,15 +105,25 @@ def resolve_program(program: str | None) -> Path | None:
         if c.exists():
             return c
 
+    # werkzeuge/ hat Unterordner (z. B. werkzeuge/sprite_editor/sped.bas),
+    # daher rekursiv nach dem Dateinamen suchen
+    werkzeuge = ROOT / "werkzeuge"
+    if werkzeuge.exists():
+        for hit in werkzeuge.rglob(program):
+            if hit.is_file():
+                return hit
+
     available = sorted(
         [p.name for p in (ROOT / "beispiele").glob("*.bas")]
         + [p.name for p in (ROOT / "lib").glob("*.bas")]
         + [p.name for p in (ROOT / "schulung").glob("*.bas")]
+        + [p.name for p in (ROOT / "werkzeuge").rglob("*.bas")]
     )
     hint = "\n  ".join(available) if available else "(keine)"
     raise FileNotFoundError(
         f"Programm '{program}' nicht gefunden.\n"
-        f"  Gesucht in: beispiele/{program}, lib/{program}, schulung/{program}\n"
+        f"  Gesucht in: beispiele/{program}, lib/{program}, "
+        f"schulung/{program}, werkzeuge/**/{program}\n"
         f"  Verfuegbar:\n  {hint}\n"
         f"  Tipp: Dateiname muss inklusive .bas-Endung angegeben werden,\n"
         f"  z. B. `--program hello.bas`."
@@ -163,15 +175,41 @@ def restore_default_autoexec(sdcard: Path, keyboard: int = DEFAULT_KEYBOARD) -> 
     write_autoexec(sdcard, [f"SET KEYBOARD {keyboard}"])
 
 
+def program_subdir(resolved: Path | None) -> str:
+    """Wenn `resolved` in einem Unterordner von werkzeuge/ liegt, gibt den
+    relativen Unterordner-Pfad zurueck (z. B. "sprite_editor"), sonst "".
+
+    deploy.py kopiert werkzeuge/sprite_editor/sped.bas nach
+    sdcard/staged/beispiele/sprite_editor/sped.bas - deshalb muss autoexec
+    `cd beispiele` UND `cd sprite_editor` machen, damit `bbcbasic sped.bas`
+    die Datei findet (und `OPENIN("sped.ini")` in sped.bas auch).
+    """
+    if resolved is None:
+        return ""
+    werkzeuge = ROOT / "werkzeuge"
+    try:
+        rel = resolved.resolve().relative_to(werkzeuge.resolve())
+    except ValueError:
+        return ""
+    # rel ist z. B. sprite_editor/sped.bas
+    parent = rel.parent
+    if parent == Path("."):
+        return ""
+    return str(parent).replace("\\", "/")
+
+
 def build_gui_autoexec(
-    program: str | None, keyboard: int = DEFAULT_KEYBOARD
+    program: str | None,
+    keyboard: int = DEFAULT_KEYBOARD,
+    subdir: str = "",
 ) -> list[str]:
     """Autoexec-Zeilen fuer eine BASIC-Session.
 
     Ohne --program: nur Keyboard + bbcbasic -> MOS-Prompt -> BBC-BASIC-Prompt.
-    Mit --program: wechselt ins beispiele/ und uebergibt den Dateinamen an
-    bbcbasic. BBC BASIC fuer Agon interpretiert das erste Argument als
-    LOAD+RUN-Datei, daher startet das Programm automatisch.
+    Mit --program: wechselt ins beispiele/ (optional noch in einen Unterordner
+    wie sprite_editor/) und uebergibt den Dateinamen an bbcbasic. BBC BASIC
+    fuer Agon interpretiert das erste Argument als LOAD+RUN-Datei, daher
+    startet das Programm automatisch.
 
     Der `cd beispiele`-Schritt sorgt dafuer, dass das Programm seine Assets
     per relativem Pfad laden kann (z. B. sprite.bas: OPENIN "ship.rgba").
@@ -183,6 +221,8 @@ def build_gui_autoexec(
     lines = [f"SET KEYBOARD {keyboard}"]
     if program:
         lines.append("cd beispiele")
+        if subdir:
+            lines.append(f"cd {subdir}")
         lines.append(f"/bin/bbcbasic {program}")
     else:
         lines.append("/bin/bbcbasic")
@@ -204,7 +244,10 @@ def run_gui(args: argparse.Namespace) -> int:
     if src is not None:
         log(f"Programm-Quelle: {src.relative_to(ROOT)}")
 
-    write_autoexec(SDCARD_STAGED, build_gui_autoexec(args.program, args.keyboard))
+    write_autoexec(
+        SDCARD_STAGED,
+        build_gui_autoexec(args.program, args.keyboard, program_subdir(src)),
+    )
 
     if args.hold and args.program:
         apply_hold_to_staged(args.program)
@@ -255,7 +298,7 @@ def run_headless(args: argparse.Namespace) -> int:
     # startet sich selbst. Ohne --program landen wir am BBC-BASIC-Prompt.
     # Programme sollten sich selbst via PROC_dbg_exit(rc) beenden, sonst
     # greift der --timeout.
-    lines = build_gui_autoexec(args.program, args.keyboard)
+    lines = build_gui_autoexec(args.program, args.keyboard, program_subdir(src))
     write_autoexec(SDCARD_STAGED, lines)
 
     if args.hold and args.program:

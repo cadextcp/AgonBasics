@@ -10,6 +10,7 @@ Quellen:
     beispiele/   -> sdcard/staged/beispiele/
     lib/         -> sdcard/staged/beispiele/
     schulung/    -> sdcard/staged/beispiele/ (Lerngruppen-Iterationen)
+    werkzeuge/   -> sdcard/staged/beispiele/ (Agon-seitige Tools, z.B. sped.bas)
     tests/*.bas  -> sdcard/staged/beispiele/ (nur auf Wunsch)
 
 Regeln:
@@ -43,6 +44,7 @@ SOURCE_DIRS = [
     ROOT / "beispiele",
     ROOT / "lib",
     ROOT / "schulung",
+    ROOT / "werkzeuge",
 ]
 
 LIB_DEBUG = ROOT / "lib" / "debug.bas"

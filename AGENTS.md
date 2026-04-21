@@ -26,14 +26,15 @@ BASIC-Debug-Bibliothek und einen Headless-Testrunner.
 ## Struktur (Kurzfassung)
 
 ```
-beispiele/    BASIC-Beispielprogramme (CRLF)
-lib/          Wiederverwendbare BASIC-Bibliotheken (debug.bas etc.)
-schulung/     Lerngruppen-Iterationen (Breakout in Schritten aufgebaut)
-tests/        Automatische BASIC-Tests + expected/ Referenzausgaben
-tools/        Python-Tooling (uv run, inline-deps PEP 723)
-docs/         Deutsche Dokumentation
-emulator/     (gitignored) Vom Setup entpackter Emulator
-sdcard/staged/(gitignored) Zusammengefuegte SD-Karte: Popup MOS + beispiele + lib + schulung
+beispiele/        BASIC-Beispielprogramme (CRLF)
+lib/              Wiederverwendbare BASIC-Bibliotheken (debug.bas etc.)
+schulung/         Lerngruppen-Iterationen (Breakout in Schritten aufgebaut)
+werkzeuge/        Agon-seitige BASIC-Tools (sprite_editor/sped.bas etc.)
+tests/            Automatische BASIC-Tests + expected/ Referenzausgaben
+tools/            Python-Tooling (uv run, inline-deps PEP 723)
+docs/             Deutsche Dokumentation
+emulator/         (gitignored) Vom Setup entpackter Emulator
+sdcard/staged/    (gitignored) Zusammengefuegte SD-Karte: Popup MOS + beispiele + lib + schulung + werkzeuge
 ```
 
 ## Tastatur-Default
@@ -49,12 +50,13 @@ Alles Host-seitige Tooling liegt in `tools/` und wird mit `uv` ausgefuehrt:
 
 ```
 uv run tools/setup.py                  # einmaliges Setup: Emulator + SD-Karte
-uv run tools/deploy.py                 # beispiele/+lib/+schulung/ -> sdcard/staged/
+uv run tools/deploy.py                 # beispiele/+lib/+schulung/+werkzeuge/ -> sdcard/staged/
 uv run tools/run.py                    # GUI-Emulator starten
 uv run tools/debug.py                  # Emulator mit eZ80-Debugger
 uv run tools/test.py                   # Headless-Tests
 uv run tools/deploy_sdcard.py          # auf echte microSD kopieren
 uv run tools/install_vscode_extension.py  # BBC-BASIC-Syntax-Highlighting aktivieren
+uv run tools/sped.py                   # SPED Sprite-Editor starten (deploy + run)
 ```
 
 Abhaengigkeiten werden per **PEP 723 inline-Script-Metadaten** am Dateianfang
