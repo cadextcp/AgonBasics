@@ -110,9 +110,14 @@ Die Extension bietet:
 - **Go to Definition** (Strg+Klick auf `PROC_foo` / `FN_bar` springt
   zum passenden `DEF`, workspace-weit).
 - **Outline / Go to Symbol** (Ctrl+Shift+O listet alle PROCs/FNs).
+- **Hover-Tooltips** fuer VDU-/PLOT-/`*FX`-Befehle (Maus drueber ->
+  Erklaerung + Link auf die offizielle Doku).
+- **Code-Snippets** fuer haeufige Muster: `vdu-sprite-move` + Tab ->
+  `VDU 23, 27, 13, x%; y%;`, `vdu-sprite-setup` + Tab -> kompletter
+  Sprite-Init-Block, `for` + Tab -> FOR/NEXT-Geruest, usw.
 - **Toggle Line Comment** (Ctrl+/) setzt `REM` am Zeilenanfang.
 
-Details + Farb-Anpassung: [`tools/vscode-bbcbasic/README.md`](tools/vscode-bbcbasic/README.md).
+Details + Snippet-Liste: [`tools/vscode-bbcbasic/README.md`](tools/vscode-bbcbasic/README.md).
 
 ## Debuggen
 
