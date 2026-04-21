@@ -1,0 +1,35 @@
+{
+    "name": "bbcbasic-agon",
+    "displayName": "BBC BASIC (Agon)",
+    "description": "Syntax-Highlighting fuer BBC BASIC auf Agon Light / Console8. Erkennt REM-Kommentare, Zeilennummern, Strings, Hex-Zahlen, Keywords und PROC-/FN-Aufrufe.",
+    "version": "0.0.1",
+    "publisher": "agonbasics",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "bbcbasic",
+                "aliases": [
+                    "BBC BASIC",
+                    "bbcbasic"
+                ],
+                "extensions": [
+                    ".bas"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "bbcbasic",
+                "scopeName": "source.bbcbasic",
+                "path": "./syntaxes/bbcbasic.tmLanguage.json"
+            }
+        ]
+    }
+}

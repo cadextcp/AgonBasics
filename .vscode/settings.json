@@ -1,7 +1,7 @@
 {
     "files.eol": "\r\n",
     "files.associations": {
-        "*.bas": "vb",
+        "*.bas": "bbcbasic",
         "autoexec.txt": "plaintext"
     },
     "[python]": {

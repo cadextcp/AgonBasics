@@ -48,12 +48,13 @@ Ein Override per CLI: `--keyboard N`. Nummernliste in
 Alles Host-seitige Tooling liegt in `tools/` und wird mit `uv` ausgefuehrt:
 
 ```
-uv run tools/setup.py         # einmaliges Setup: Emulator + SD-Karte
-uv run tools/deploy.py        # beispiele/+lib/ -> sdcard/staged/
-uv run tools/run.py           # GUI-Emulator starten
-uv run tools/debug.py         # Emulator mit eZ80-Debugger
-uv run tools/test.py          # Headless-Tests
-uv run tools/deploy_sdcard.py # auf echte microSD kopieren
+uv run tools/setup.py                  # einmaliges Setup: Emulator + SD-Karte
+uv run tools/deploy.py                 # beispiele/+lib/+schulung/ -> sdcard/staged/
+uv run tools/run.py                    # GUI-Emulator starten
+uv run tools/debug.py                  # Emulator mit eZ80-Debugger
+uv run tools/test.py                   # Headless-Tests
+uv run tools/deploy_sdcard.py          # auf echte microSD kopieren
+uv run tools/install_vscode_extension.py  # BBC-BASIC-Syntax-Highlighting aktivieren
 ```
 
 Abhaengigkeiten werden per **PEP 723 inline-Script-Metadaten** am Dateianfang

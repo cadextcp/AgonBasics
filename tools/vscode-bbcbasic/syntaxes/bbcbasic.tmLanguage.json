@@ -1,0 +1,99 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "BBC BASIC (Agon)",
+    "scopeName": "source.bbcbasic",
+    "fileTypes": [
+        "bas"
+    ],
+    "patterns": [
+        { "include": "#line-number" },
+        { "include": "#strings" },
+        { "include": "#rem-comment" },
+        { "include": "#apostrophe-comment" },
+        { "include": "#star-command" },
+        { "include": "#hex-numbers" },
+        { "include": "#numbers" },
+        { "include": "#control-keywords" },
+        { "include": "#declaration-keywords" },
+        { "include": "#io-keywords" },
+        { "include": "#builtin-functions" },
+        { "include": "#proc-call" },
+        { "include": "#constants" },
+        { "include": "#operators" }
+    ],
+    "repository": {
+        "line-number": {
+            "match": "^\\s*\\d+(?=\\s|$)",
+            "name": "entity.name.tag.line-number.bbcbasic"
+        },
+        "rem-comment": {
+            "begin": "(?i)\\bREM\\b",
+            "beginCaptures": {
+                "0": { "name": "keyword.other.rem.bbcbasic" }
+            },
+            "end": "$",
+            "name": "comment.line.rem.bbcbasic"
+        },
+        "apostrophe-comment": {
+            "match": "'.*$",
+            "name": "comment.line.apostrophe.bbcbasic"
+        },
+        "strings": {
+            "begin": "\"",
+            "beginCaptures": {
+                "0": { "name": "punctuation.definition.string.begin.bbcbasic" }
+            },
+            "end": "\"",
+            "endCaptures": {
+                "0": { "name": "punctuation.definition.string.end.bbcbasic" }
+            },
+            "name": "string.quoted.double.bbcbasic",
+            "patterns": [
+                {
+                    "match": "\"\"",
+                    "name": "constant.character.escape.bbcbasic"
+                }
+            ]
+        },
+        "star-command": {
+            "match": "\\*[A-Za-z][A-Za-z0-9_]*",
+            "name": "keyword.other.star-command.bbcbasic"
+        },
+        "hex-numbers": {
+            "match": "&[0-9A-Fa-f]+",
+            "name": "constant.numeric.hex.bbcbasic"
+        },
+        "numbers": {
+            "match": "\\b\\d+(\\.\\d+)?([eE][+-]?\\d+)?\\b",
+            "name": "constant.numeric.bbcbasic"
+        },
+        "control-keywords": {
+            "match": "(?i)\\b(IF|THEN|ELSE|ELIF|ELSEIF|ENDIF|FOR|TO|STEP|NEXT|REPEAT|UNTIL|WHILE|ENDWHILE|WEND|CASE|WHEN|OF|OTHERWISE|ENDCASE|GOTO|GOSUB|RETURN|STOP|END|ON|ERROR|RESTORE|DATA|READ|EXIT|BREAK)\\b",
+            "name": "keyword.control.bbcbasic"
+        },
+        "declaration-keywords": {
+            "match": "(?i)\\b(DEF|ENDPROC|LOCAL|DIM|PRIVATE|GLOBAL|LIBRARY|INSTALL)\\b",
+            "name": "storage.type.bbcbasic"
+        },
+        "io-keywords": {
+            "match": "(?i)\\b(PRINT|INPUT|GET|INKEY|OPENOUT|OPENIN|OPENUP|CLOSE|BPUT|BGET|VDU|MODE|GCOL|COLOUR|COLOR|CLG|CLS|MOVE|PLOT|DRAW|CIRCLE|RECTANGLE|FILL|SOUND|ENVELOPE|TIME|TIME\\$|ADVAL|POINT|TEXT|ORIGIN|OFF|OSCLI|CALL|USR|PROC|FN)\\b",
+            "name": "support.function.io.bbcbasic"
+        },
+        "builtin-functions": {
+            "match": "(?i)\\b(ABS|ACS|ASC|ASN|ATN|CHR\\$|COS|DEG|ERL|ERR|EVAL|EXP|INSTR|INT|LEFT\\$|LEN|LN|LOG|MID\\$|PI|POS|RAD|RIGHT\\$|RND|SGN|SIN|SPC|SQR|STR\\$|STRING\\$|SUM|TAB|TAN|VAL|VPOS|EOF|PTR|EXT)\\b",
+            "name": "support.function.builtin.bbcbasic"
+        },
+        "proc-call": {
+            "match": "\\b(PROC|FN)_?[A-Za-z][A-Za-z0-9_]*",
+            "name": "entity.name.function.bbcbasic"
+        },
+        "constants": {
+            "match": "(?i)\\b(TRUE|FALSE)\\b",
+            "name": "constant.language.bbcbasic"
+        },
+        "operators": {
+            "match": "(?i)\\b(AND|OR|NOT|XOR|EOR|MOD|DIV)\\b|<>|<=|>=|<<|>>|[=<>+\\-*/^?!]",
+            "name": "keyword.operator.bbcbasic"
+        }
+    }
+}

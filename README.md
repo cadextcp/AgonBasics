@@ -33,8 +33,10 @@ Fuer die Installation von `uv` und alles weitere siehe
 |---|---|
 | `beispiele/` | BBC-BASIC-Beispielprogramme (`hello`, `sprite`, `timer`, `assembler`, `melodie`, `debug_demo`, ...) |
 | `lib/` | `debug.bas` - Trace-/Assert-/Breakpoint-Library (funktioniert Emulator UND Hardware) |
+| `schulung/` | Lerngruppen-Iterationen (Breakout schrittweise aufgebaut, jede Iteration selbststaendig) |
 | `tests/` | `test_*.bas` + erwartete Ausgaben fuer `tools/test.py` |
-| `tools/` | Python-Skripte: `setup`, `deploy`, `run`, `debug`, `test`, `deploy_sdcard`, `make_ship` |
+| `tools/` | Python-Skripte: `setup`, `deploy`, `run`, `debug`, `test`, `deploy_sdcard`, `make_ship`, `install_vscode_extension` |
+| `tools/vscode-bbcbasic/` | Lokale VS-Code-Extension: Syntax-Highlighting fuer `.bas` (REM, Keywords, Strings) |
 | `docs/` | Deutsche Dokumentation: Setup, Workflow, Debugging, Testing, Resources |
 | `.vscode/` | VS-Code-Tasks und -Launch-Configs |
 | `.github/workflows/` | CI-Workflow (Headless-Tests auf Windows-Runner) |
@@ -72,6 +74,23 @@ Fuer die Installation von `uv` und alles weitere siehe
 | `uv run tools/deploy_sdcard.py F: --confirm` | Auf echte microSD kopieren |
 | `uv run tools/make_ship.py` | Beispiel-Asset (16x16 Sprite) erzeugen |
 | `uv run tools/fetch_docs.py` | Offizielle Agon-Doku lokal spiegeln |
+| `uv run tools/install_vscode_extension.py` | BBC-BASIC-Syntax-Highlighting in VS Code aktivieren |
+
+## VS Code / Syntax-Highlighting
+
+`.bas` ist als BBC-BASIC-Sprache registriert. Die aktuelle VS-Code-VB-
+Grammatik erkennt `REM`-Kommentare leider nicht (sie kennt nur `'`), darum
+liegt unter `tools/vscode-bbcbasic/` eine schlanke lokale Extension mit
+eigener BBC-BASIC-Grammatik. Einmalige Installation:
+
+```
+uv run tools/install_vscode_extension.py
+```
+
+Danach VS Code neu laden (Ctrl+Shift+P -> "Developer: Reload Window");
+`.bas`-Dateien zeigen jetzt REM-Kommentare, Zeilennummern, Keywords,
+PROC-Aufrufe, Hex-Zahlen und Strings farblich getrennt an. Details +
+Farb-Anpassung: [`tools/vscode-bbcbasic/README.md`](tools/vscode-bbcbasic/README.md).
 
 ## Debuggen
 
