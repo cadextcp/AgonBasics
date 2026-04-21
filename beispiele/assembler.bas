@@ -7,11 +7,11 @@
 70   LD HL, &40000
 80   LD B, 100
 90   .loop
-100  LD (HL), A
-110  INC HL
-120  DJNZ loop
-130  RET
-140  ]
+100   LD (HL), A
+110   INC HL
+120   DJNZ loop
+130   RET
+140   ]
 150 NEXT pass%
 160 CALL code%
 170 PRINT "Assembler fertig!"
